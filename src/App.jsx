@@ -31,6 +31,7 @@ const ICONS = {
   oral: "/icons/oral_swab.png",
   breastmilk: "/icons/breast_milk.png",
   skin: "/icons/skin_swab.png",
+  tissue: "/icons/biopsy.png",
 
   // Stage 2 - Extraction
   dna: "/icons/dna_icon.png",
@@ -58,7 +59,8 @@ const TOOLTIPS = {
   timepoints:
     "More timepoints reveal temporal dynamics of the microbiome. Longitudinal studies cost more but provide mechanistic insights.",
   sampleTypes:
-    "Each sample type reveals different microbial communities. Stool: gut microbiome. Vaginal: reproductive health. Oral: oral cavity. Skin: skin barrier function.",
+    "Each sample type reveals different microbial communities. Stool: gut microbiome. Vaginal: reproductive health. Oral: oral cavity. Skin: skin barrier function. Tissue biopsy: diseased or specific tissues.",
+  tissue: "Tissue biopsy from specific organs. More expensive but provides localized microbial communities. Useful for studying infection sites.",
   incentives:
     "Paying participants increases recruitment and retention rates. Essential for longitudinal studies to reduce dropout.",
 
@@ -92,8 +94,14 @@ const TOOLTIPS = {
 
 const COSTS = {
   // Stage 1
-  participant: 5,          // per participant
-  sampleTypePerSample: 1,  // per sample type per timepoint per participant
+  participant: {
+    mice: 2,
+    humans: 5,
+  },
+  sampleTypePerSample: {
+    default: 1,
+    tissue: 3,
+  },
   incentivePerParticipant: 2,
 
   // Stage 2 (per sample)
@@ -240,6 +248,7 @@ export default function App() {
   const [stage, setStage] = useState(1);
 
   // Stage 1
+  const [participantType, setParticipantType] = useState("humans");
   const [participants, setParticipants] = useState(0);
   const [timepoints, setTimepoints] = useState(1);
   const [sampleTypes, setSampleTypes] = useState({
@@ -248,6 +257,7 @@ export default function App() {
     oral: false,
     breastmilk: false,
     skin: false,
+    tissue: false,
   });
   const [incentives, setIncentives] = useState(false);
 
@@ -287,11 +297,17 @@ export default function App() {
   const stage1Cost = useMemo(() => {
     const p = clampInt(participants);
     const t = clampInt(timepoints, 1);
-    const sampleCost = p * t * selectedSampleTypeCount * COSTS.sampleTypePerSample;
-    const recruitmentCost = p * COSTS.participant;
+    const participantCost = p * COSTS.participant[participantType];
+    const sampleCost = p * t * selectedSampleTypeCount * COSTS.sampleTypePerSample.default;
+    
+    // Add extra cost for tissue biopsies
+    const tissueCost = sampleTypes.tissue 
+      ? p * t * (COSTS.sampleTypePerSample.tissue - COSTS.sampleTypePerSample.default)
+      : 0;
+    
     const incentiveCost = incentives ? p * COSTS.incentivePerParticipant : 0;
-    return recruitmentCost + sampleCost + incentiveCost;
-  }, [participants, timepoints, selectedSampleTypeCount, incentives]);
+    return participantCost + sampleCost + tissueCost + incentiveCost;
+  }, [participants, timepoints, selectedSampleTypeCount, participantType, incentives, sampleTypes.tissue]);
 
   const stage2Cost = useMemo(() => {
     const perSampleExtraction = Object.entries(extraction)
@@ -327,9 +343,10 @@ export default function App() {
 
   function resetAll() {
     setStage(1);
+    setParticipantType("humans");
     setParticipants(0);
     setTimepoints(1);
-    setSampleTypes({ stool: false, vaginal: false, oral: false, breastmilk: false, skin: false });
+    setSampleTypes({ stool: false, vaginal: false, oral: false, breastmilk: false, skin: false, tissue: false });
     setIncentives(false);
     setExtraction({ dna: false, rna: false, metabolite: false, isolation: false });
     setSequencing({ amplicon: false, shotgun: false, rnaseq: false, metabolomics: false });
@@ -526,9 +543,31 @@ export default function App() {
           <div style={cardStyle}>
             <h2 style={{ marginTop: 0, color: COLORS.stage1.text }}>Recruitment & Sampling</h2>
 
+            <div style={{ ...cardStyle, background: COLORS.stage1.light, marginBottom: 14 }}>
+              <div style={{ fontWeight: 800, marginBottom: 12 }}>Study Subject <InfoTip text="Choose between mouse models (cheaper) or human subjects (more expensive, more relevant for human disease)" /></div>
+              <div style={{ display: "flex", gap: 16 }}>
+                {[
+                  ["mice", "Mouse models", "2 credits/subject"],
+                  ["humans", "Human subjects", "5 credits/subject"],
+                ].map(([type, label, cost]) => (
+                  <label key={type} style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+                    <input
+                      type="radio"
+                      name="participantType"
+                      value={type}
+                      checked={participantType === type}
+                      onChange={(e) => setParticipantType(e.target.value)}
+                    />
+                    <span style={{ fontWeight: 600 }}>{label}</span>
+                    <span style={{ color: "#6b7280", fontSize: 12 }}>({cost})</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               <label>
-                <div style={{ fontWeight: 600 }}>  Number of participants  <InfoTip text={TOOLTIPS.participants} /> </div>
+                <div style={{ fontWeight: 600 }}>Number of {participantType === "mice" ? "mice" : "participants"} <InfoTip text={TOOLTIPS.participants} /></div>
                 <input
                   type="number"
                   value={participants}
@@ -537,7 +576,7 @@ export default function App() {
                   style={{ width: "100%", padding: 10, borderRadius: 10, border: `2px solid ${COLORS.stage1.primary}` }}
                 />
                 <div style={{ color: "#6b7280", fontSize: 12 }}>
-                  × {COSTS.participant} credits = {(clampInt(participants) * COSTS.participant).toFixed(1)}
+                  × {COSTS.participant[participantType]} credits = {(clampInt(participants) * COSTS.participant[participantType]).toFixed(1)}
                 </div>
               </label>
 
@@ -554,7 +593,7 @@ export default function App() {
               </label>
             </div>
 
-            <div style={{ marginTop: 14, fontWeight: 700 }}>Sample types (1 credit per sample) <InfoTip text={TOOLTIPS.sampleTypes} /></div>
+            <div style={{ marginTop: 14, fontWeight: 700 }}>Sample types <InfoTip text={TOOLTIPS.sampleTypes} /></div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginTop: 10 }}>
               {[
                 ["stool", "Stool sample"],
@@ -562,32 +601,37 @@ export default function App() {
                 ["oral", "Oral swab"],
                 ["breastmilk", "Breast milk"],
                 ["skin", "Skin swab"],
-              ].map(([key, label]) => (
-                <label
-                  key={key}
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 8,
-                    alignItems: "center",
-                    padding: 12,
-                    borderRadius: 12,
-                    border: `2px solid ${sampleTypes[key] ? COLORS.stage1.primary : "#d1d5db"}`,
-                    background: sampleTypes[key] ? COLORS.stage1.light : "white",
-                    cursor: "pointer",
-                    transition: "all 0.2s ease",
-                  }}
-                >
-                  <img src={ICONS[key]} alt={label} style={{ width: 48, height: 48, objectFit: "contain" }} />
-                  <span style={{ fontSize: 13, fontWeight: 500, textAlign: "center" }}>{label}</span>
-                  <input
-                    type="checkbox"
-                    checked={sampleTypes[key]}
-                    onChange={(e) => setSampleTypes((prev) => ({ ...prev, [key]: e.target.checked }))}
-                    style={{ marginTop: 4 }}
-                  />
-                </label>
-              ))}
+                ["tissue", "Tissue biopsy"],
+              ].map(([key, label]) => {
+                const cost = key === "tissue" ? COSTS.sampleTypePerSample.tissue : COSTS.sampleTypePerSample.default;
+                return (
+                  <label
+                    key={key}
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 8,
+                      alignItems: "center",
+                      padding: 12,
+                      borderRadius: 12,
+                      border: `2px solid ${sampleTypes[key] ? COLORS.stage1.primary : "#d1d5db"}`,
+                      background: sampleTypes[key] ? COLORS.stage1.light : "white",
+                      cursor: "pointer",
+                      transition: "all 0.2s ease",
+                    }}
+                  >
+                    <img src={ICONS[key]} alt={label} style={{ width: 48, height: 48, objectFit: "contain" }} />
+                    <span style={{ fontSize: 13, fontWeight: 500, textAlign: "center" }}>{label}</span>
+                    <span style={{ fontSize: 11, color: "#6b7280" }}>{cost} credits/sample</span>
+                    <input
+                      type="checkbox"
+                      checked={sampleTypes[key]}
+                      onChange={(e) => setSampleTypes((prev) => ({ ...prev, [key]: e.target.checked }))}
+                      style={{ marginTop: 4 }}
+                    />
+                  </label>
+                );
+              })}
             </div>
 
             {selectedSampleTypeCount === 0 && (
