@@ -813,7 +813,7 @@ export default function App() {
             color: #9ca3af !important;
           }
 
-          /* Light background sections */
+          /* Light background sections - convert to dark */
           div[style*="background: #ecfdf5"] {
             background: #064e3b !important;
           }
@@ -836,6 +836,15 @@ export default function App() {
 
           div[style*="background: #f3e8ff"] {
             background: #3b0764 !important;
+          }
+
+          /* Make text inside colored boxes BLACK for contrast on dark backgrounds */
+          div[style*="background: #ecfdf5"] *,
+          div[style*="background: #eff6ff"] *,
+          div[style*="background: #faf5ff"] *,
+          div[style*="background: #dbeafe"] *,
+          div[style*="background: #f3e8ff"] * {
+            color: #000000 !important;
           }
 
           /* Error/warning colors stay visible */
@@ -908,19 +917,6 @@ export default function App() {
           button:disabled {
             background: #4b5563 !important;
             color: #9ca3af !important;
-          }
-
-          /* Text in light colored boxes should be dark still */
-          div[style*="background: #ecfdf5"] h3,
-          div[style*="background: #ecfdf5"] label,
-          div[style*="background: #ecfdf5"] span,
-          div[style*="background: #eff6ff"] h3,
-          div[style*="background: #eff6ff"] label,
-          div[style*="background: #eff6ff"] span,
-          div[style*="background: #faf5ff"] h3,
-          div[style*="background: #faf5ff"] label,
-          div[style*="background: #faf5ff"] span {
-            color: #f0f0f0 !important;
           }
 
           /* Lock icon background in dark mode */
