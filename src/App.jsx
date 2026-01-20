@@ -406,7 +406,7 @@ export default function App() {
             boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
           }}>
             <h1 style={{ marginTop: 0, color: "#111827", fontSize: isMobile ? 22 : 28 }}>Microbiome Budget Game</h1>
-            <p style={{ color: "#6b7280", marginBottom: 24, fontSize: isMobile ? 14 : 16 }}>
+            <p style={{ color: "#1f2937", marginBottom: 24, fontSize: isMobile ? 14 : 16 }}>
               Design a microbiome sequencing study within your budget
             </p>
 
@@ -505,7 +505,7 @@ export default function App() {
             overflowY: "auto",
           }}>
             <h1 style={{ marginTop: 0, color: COLORS.stage1.text, fontSize: isMobile ? 20 : 26 }}>Study Design Summary</h1>
-            <p style={{ color: "#6b7280", marginBottom: 20, fontSize: isMobile ? 13 : 14 }}>Team: <strong>{teamName}</strong></p>
+            <p style={{ color: "#4b5563", marginBottom: 20, fontSize: isMobile ? 13 : 14 }}>Team: <strong>{teamName}</strong></p>
 
             <div style={{ borderTop: "1px solid #e5e7eb", paddingTop: 16 }}>
               <h3 style={{ color: COLORS.stage1.text, marginTop: 0, fontSize: isMobile ? 16 : 18 }}>Research Design</h3>
@@ -569,7 +569,7 @@ export default function App() {
                           {extractionLabels[key]}
                         </span>
                       ))}
-                    {Object.values(extraction).every(v => !v) && <span style={{ color: "#6b7280", fontStyle: "italic" }}>None selected</span>}
+                    {Object.values(extraction).every(v => !v) && <span style={{ color: "#4b5563", fontStyle: "italic" }}>None selected</span>}
                   </div>
                 </div>
                 <div>
@@ -582,7 +582,7 @@ export default function App() {
                           {sequencingLabels[key]}
                         </span>
                       ))}
-                    {Object.values(sequencing).every(v => !v) && <span style={{ color: "#6b7280", fontStyle: "italic" }}>None selected</span>}
+                    {Object.values(sequencing).every(v => !v) && <span style={{ color: "#4b5563", fontStyle: "italic" }}>None selected</span>}
                   </div>
                 </div>
               </div>
@@ -601,7 +601,7 @@ export default function App() {
                           {analysisLabels[key]}
                         </span>
                       ))}
-                    {Object.values(analysis).every(v => !v) && <span style={{ color: "#6b7280", fontStyle: "italic" }}>None selected</span>}
+                    {Object.values(analysis).every(v => !v) && <span style={{ color: "#4b5563", fontStyle: "italic" }}>None selected</span>}
                   </div>
                 </div>
                 {clampInt(hpcHours, 0) > 0 && (
@@ -616,19 +616,19 @@ export default function App() {
               <h3 style={{ marginTop: 0, color: overBudget ? "#b91c1c" : COLORS.stage1.text, fontSize: isMobile ? 16 : 18 }}>Budget Summary</h3>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, fontSize: isMobile ? 13 : 14, marginBottom: 12 }} data-grid="summary-grid">
                 <div>
-                  <div style={{ color: "#6b7280", fontSize: 12 }}>Stage 1: Recruitment & Sampling</div>
+                  <div style={{ color: "#4b5563", fontSize: 12 }}>Stage 1: Recruitment & Sampling</div>
                   <div style={{ fontWeight: 700, fontSize: 16 }}>{stage1Cost.toFixed(1)} credits</div>
                 </div>
                 <div>
-                  <div style={{ color: "#6b7280", fontSize: 12 }}>Stage 2: Data Collection</div>
+                  <div style={{ color: "#4b5563", fontSize: 12 }}>Stage 2: Data Collection</div>
                   <div style={{ fontWeight: 700, fontSize: 16 }}>{stage2Cost.toFixed(1)} credits</div>
                 </div>
                 <div>
-                  <div style={{ color: "#6b7280", fontSize: 12 }}>Stage 3: Data Analysis</div>
+                  <div style={{ color: "#4b5563", fontSize: 12 }}>Stage 3: Data Analysis</div>
                   <div style={{ fontWeight: 700, fontSize: 16 }}>{stage3Cost.toFixed(1)} credits</div>
                 </div>
                 <div>
-                  <div style={{ color: "#6b7280", fontSize: 12 }}>Total Budget</div>
+                  <div style={{ color: "#4b5563", fontSize: 12 }}>Total Budget</div>
                   <div style={{ fontWeight: 700, fontSize: 16 }}>{TOTAL_BUDGET} credits</div>
                 </div>
               </div>
@@ -724,7 +724,7 @@ export default function App() {
         <div style={headerStyle} data-grid="header">
           <div>
             <div style={{ fontSize: isMobile ? 18 : 22, fontWeight: 700 }}>Microbiome Project Budget Game</div>
-            <div style={{ color: "#6b7280", fontSize: isMobile ? 12 : 14 }}>Team: <strong>{teamName}</strong></div>
+            <div style={{ color: "#4b5563", fontSize: isMobile ? 12 : 14 }}>Team: <strong>{teamName}</strong></div>
           </div>
           <button onClick={restartGame} style={{ padding: "8px 12px", borderRadius: 10, border: "1px solid #d1d5db", fontSize: isMobile ? 13 : 14 }}>
             New Game
@@ -734,7 +734,7 @@ export default function App() {
         <div style={{ ...cardStyle, marginBottom: 16, borderColor: overBudget ? "#ef4444" : "#e5e7eb" }}>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }} data-grid="budget-row">
             <div>
-              <div style={{ color: "#6b7280", fontSize: 12 }}>Your Team&apos;s Budget</div>
+              <div style={{ color: "#374151", fontSize: 12 }}>Your Team&apos;s Budget</div>
               <div style={{ fontSize: 18, fontWeight: 700 }}>
                 {remaining.toFixed(1)} / {TOTAL_BUDGET} credits remaining
               </div>
@@ -844,7 +844,7 @@ export default function App() {
                   onChange={(e) => setParticipants(clampInt(parseFloat(e.target.value)))}
                   style={{ width: "100%", padding: 10, borderRadius: 10, border: `2px solid ${COLORS.stage1.primary}` }}
                 />
-                <div style={{ color: "#6b7280", fontSize: 12 }}>
+                <div style={{ color: "#4b5563", fontSize: 12 }}>
                   × {COSTS.participant[participantType]} credits = {(clampInt(participants) * COSTS.participant[participantType]).toFixed(1)}
                 </div>
               </label>
@@ -858,7 +858,7 @@ export default function App() {
                   onChange={(e) => setTimepoints(clampInt(parseFloat(e.target.value), 1))}
                   style={{ width: "100%", padding: 10, borderRadius: 10, border: `2px solid ${COLORS.stage1.primary}` }}
                 />
-                <div style={{ color: "#6b7280", fontSize: 12 }}>collection points</div>
+                <div style={{ color: "#4b5563", fontSize: 12 }}>collection points</div>
               </label>
             </div>
 
@@ -891,7 +891,7 @@ export default function App() {
                   >
                     <img src={ICONS[key]} alt={label} style={{ width: isMobile ? 40 : 48, height: isMobile ? 40 : 48, objectFit: "contain" }} />
                     <span style={{ fontSize: isMobile ? 12 : 13, fontWeight: 500, textAlign: "center" }}>{label}</span>
-                    <span style={{ fontSize: isMobile ? 10 : 11, color: "#6b7280" }}>{cost} credits/sample</span>
+                    <span style={{ fontSize: isMobile ? 10 : 11, color: "#4b5563" }}>{cost} credits/sample</span>
                     <input
                       type="checkbox"
                       checked={sampleTypes[key]}
@@ -912,7 +912,7 @@ export default function App() {
             <label style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 16 }}>
               <input type="checkbox" checked={incentives} onChange={(e) => setIncentives(e.target.checked)} />
               <span style={{ fontWeight: 700 }}>Include participant incentives <InfoTip text={TOOLTIPS.incentives} /></span>
-              <span style={{ color: "#6b7280" }}>({COSTS.incentivePerParticipant} credits/participant)</span>
+              <span style={{ color: "#4b5563" }}>({COSTS.incentivePerParticipant} credits/participant)</span>
             </label>
 
             <div style={{ marginTop: 16, padding: 12, borderRadius: 12, background: COLORS.stage1.light, border: `1px solid ${COLORS.stage1.border}` }}>
@@ -960,7 +960,7 @@ export default function App() {
                         />
                         {label} <InfoTip text={TOOLTIPS[k]} />
                       </span>
-                      <span style={{ color: "#6b7280", whiteSpace: "nowrap" }}>{COSTS.extraction[k]}</span>
+                      <span style={{ color: "#4b5563", whiteSpace: "nowrap" }}>{COSTS.extraction[k]}</span>
                     </label>
                   ))}
                 </div>
@@ -992,7 +992,7 @@ export default function App() {
                           {label} <InfoTip text={TOOLTIPS[k]} />
                           {isDisabled && <div style={{ color: "#d97706", fontSize: 11, marginTop: 4 }}>⚠️ {restrictionMsg}</div>}
                         </span>
-                        <span style={{ color: "#6b7280", whiteSpace: "nowrap" }}>{COSTS.sequencing[k]}</span>
+                        <span style={{ color: "#4b5563", whiteSpace: "nowrap" }}>{COSTS.sequencing[k]}</span>
                       </label>
                     );
                   })}
