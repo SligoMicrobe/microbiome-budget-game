@@ -50,6 +50,9 @@ const ICONS = {
   functional: "/icons/functional_icon.png",
   mag: "/icons/mags_icon.png",
   ml: "/icons/machinelearning_icon.png",
+
+  // Utility icons
+  lock: "/icons/lock_icon.png",
 };
 
 const TOOLTIPS = {
@@ -1179,21 +1182,26 @@ export default function App() {
                     const isDisabled = !!restrictionMsg;
                     
                     return (
-                      <label key={k} style={{ display: "flex", gap: 10, alignItems: "center", padding: "8px 10px", borderRadius: 10, cursor: isDisabled ? "not-allowed" : "pointer", transition: "all 0.2s ease", background: sequencing[k] ? "rgba(37, 99, 235, 0.1)" : "white", opacity: isDisabled ? 0.5 : 1 }}>
-                        <img src={ICONS[k]} alt={label} style={{ width: 32, height: 32, objectFit: "contain", flexShrink: 0 }} />
-                        <span style={{ flex: 1 }}>
-                          <input
-                            type="checkbox"
-                            checked={sequencing[k]}
-                            onChange={(e) => setSequencing((prev) => ({ ...prev, [k]: e.target.checked }))}
-                            style={{ marginRight: 8 }}
-                            disabled={isDisabled}
-                          />
-                          {label} <InfoTip text={TOOLTIPS[k]} />
-                          {isDisabled && <div style={{ color: "#d97706", fontSize: 11, marginTop: 4 }}>⚠️ {restrictionMsg}</div>}
-                        </span>
-                        <span style={{ color: "#4b5563", whiteSpace: "nowrap" }}>{COSTS.sequencing[k]}</span>
-                      </label>
+                      <div key={k} style={{ position: "relative" }}>
+                        {isDisabled && (
+                          <img src={ICONS.lock} alt="locked" style={{ position: "absolute", top: 2, right: 2, width: 24, height: 24, zIndex: 10 }} />
+                        )}
+                        <label style={{ display: "flex", gap: 10, alignItems: "center", padding: "8px 10px", borderRadius: 10, cursor: isDisabled ? "not-allowed" : "pointer", transition: "all 0.2s ease", background: sequencing[k] ? "rgba(37, 99, 235, 0.1)" : "white", opacity: isDisabled ? 0.5 : 1 }}>
+                          <img src={ICONS[k]} alt={label} style={{ width: 32, height: 32, objectFit: "contain", flexShrink: 0 }} />
+                          <span style={{ flex: 1 }}>
+                            <input
+                              type="checkbox"
+                              checked={sequencing[k]}
+                              onChange={(e) => setSequencing((prev) => ({ ...prev, [k]: e.target.checked }))}
+                              style={{ marginRight: 8 }}
+                              disabled={isDisabled}
+                            />
+                            {label} <InfoTip text={TOOLTIPS[k]} />
+                            {isDisabled && <div style={{ color: "#d97706", fontSize: 11, marginTop: 4 }}>⚠️ {restrictionMsg}</div>}
+                          </span>
+                          <span style={{ color: "#4b5563", whiteSpace: "nowrap" }}>{COSTS.sequencing[k]}</span>
+                        </label>
+                      </div>
                     );
                   })}
                 </div>
@@ -1237,24 +1245,29 @@ export default function App() {
                   const hpcPerSample = COSTS.hpcHoursPerSample[k] || 0;
                   
                   return (
-                    <label key={k} style={{ display: "flex", gap: 10, alignItems: "center", padding: "8px 10px", borderRadius: 10, cursor: isDisabled ? "not-allowed" : "pointer", transition: "all 0.2s ease", background: analysis[k] ? "rgba(124, 58, 237, 0.1)" : "white", opacity: isDisabled ? 0.5 : 1 }}>
-                      <img src={ICONS[k]} alt={label} style={{ width: 32, height: 32, objectFit: "contain", flexShrink: 0 }} />
-                      <span style={{ flex: 1 }}>
-                        <input
-                          type="checkbox"
-                          checked={analysis[k]}
-                          onChange={(e) => setAnalysis((prev) => ({ ...prev, [k]: e.target.checked }))}
-                          style={{ marginRight: 8 }}
-                          disabled={isDisabled}
-                        />
-                        {label} <InfoTip text={TOOLTIPS[k]} />
-                        {isDisabled && <div style={{ color: "#d97706", fontSize: 11, marginTop: 4 }}>⚠️ {restrictionMsg}</div>}
-                      </span>
-                      <span style={{ color: "#6b7280", whiteSpace: "nowrap" }}>
-                        <div style={{ fontSize: 12 }}>{COSTS.analysisPerSample[k]}</div>
-                        <div style={{ fontSize: 11, color: "#7c3aed", fontWeight: 600 }}>{hpcPerSample} hrs/sample</div>
-                      </span>
-                    </label>
+                    <div key={k} style={{ position: "relative" }}>
+                      {isDisabled && (
+                        <img src={ICONS.lock} alt="locked" style={{ position: "absolute", top: 2, right: 2, width: 24, height: 24, zIndex: 10 }} />
+                      )}
+                      <label style={{ display: "flex", gap: 10, alignItems: "center", padding: "8px 10px", borderRadius: 10, cursor: isDisabled ? "not-allowed" : "pointer", transition: "all 0.2s ease", background: analysis[k] ? "rgba(124, 58, 237, 0.1)" : "white", opacity: isDisabled ? 0.5 : 1 }}>
+                        <img src={ICONS[k]} alt={label} style={{ width: 32, height: 32, objectFit: "contain", flexShrink: 0 }} />
+                        <span style={{ flex: 1 }}>
+                          <input
+                            type="checkbox"
+                            checked={analysis[k]}
+                            onChange={(e) => setAnalysis((prev) => ({ ...prev, [k]: e.target.checked }))}
+                            style={{ marginRight: 8 }}
+                            disabled={isDisabled}
+                          />
+                          {label} <InfoTip text={TOOLTIPS[k]} />
+                          {isDisabled && <div style={{ color: "#d97706", fontSize: 11, marginTop: 4 }}>⚠️ {restrictionMsg}</div>}
+                        </span>
+                        <span style={{ color: "#6b7280", whiteSpace: "nowrap" }}>
+                          <div style={{ fontSize: 12 }}>{COSTS.analysisPerSample[k]}</div>
+                          <div style={{ fontSize: 11, color: "#7c3aed", fontWeight: 600 }}>{hpcPerSample} hrs/sample</div>
+                        </span>
+                      </label>
+                    </div>
                   );
                 })}
               </div>
