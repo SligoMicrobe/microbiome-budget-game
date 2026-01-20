@@ -126,6 +126,12 @@ const COSTS = {
     ml: 2,
   },
   hpcPerHour: 0.1,
+  hpcHoursPerSample: {
+    taxonomy: 0.5,
+    functional: 1.5,
+    mag: 4,
+    ml: 2,
+  },
 };
 
 const RESTRICTIONS = {
@@ -294,7 +300,6 @@ export default function App() {
     mag: false,
     ml: false,
   });
-  const [hpcHours, setHpcHours] = useState(0);
 
   // ---- Derived values ----
   const selectedSampleTypeCount = useMemo(
@@ -333,12 +338,18 @@ export default function App() {
     return totalSamples * (perSampleExtraction + perSampleSequencing);
   }, [extraction, sequencing, totalSamples]);
 
+  const hpcHours = useMemo(() => {
+    return Object.entries(analysis)
+      .filter(([, v]) => v)
+      .reduce((sum, [k]) => sum + (COSTS.hpcHoursPerSample[k] || 0), 0) * totalSamples;
+  }, [analysis, totalSamples]);
+
   const stage3Cost = useMemo(() => {
     const perSampleAnalysis = Object.entries(analysis)
       .filter(([, v]) => v)
       .reduce((sum, [k]) => sum + COSTS.analysisPerSample[k], 0);
 
-    const hpcCost = Math.max(0, Number(hpcHours) || 0) * COSTS.hpcPerHour;
+    const hpcCost = hpcHours * COSTS.hpcPerHour;
     return totalSamples * perSampleAnalysis + hpcCost;
   }, [analysis, hpcHours, totalSamples]);
 
@@ -363,7 +374,6 @@ export default function App() {
     setExtraction({ dna: false, rna: false, metabolite: false, isolation: false });
     setSequencing({ amplicon: false, shotgun: false, rnaseq: false, metabolomics: false });
     setAnalysis({ taxonomy: false, functional: false, mag: false, ml: false });
-    setHpcHours(0);
   }
 
   function restartGame() {
@@ -718,6 +728,119 @@ export default function App() {
           h2 { font-size: 18px !important; }
           h3 { font-size: 16px !important; }
         }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+          body, div[style*="background: #f6f7fb"] {
+            background: #111827 !important;
+          }
+          
+          div[style*="background: white"] {
+            background: #1f2937 !important;
+            border-color: #374151 !important;
+          }
+
+          /* Text colors in dark mode */
+          h1, h2, h3 {
+            color: #f0f0f0 !important;
+          }
+
+          /* Light gray text to light in dark mode */
+          div[style*="color: #6b7280"],
+          div[style*="color: #4b5563"],
+          div[style*="color: #374151"],
+          div[style*="color: #1f2937"],
+          span[style*="color: #6b7280"],
+          span[style*="color: #4b5563"],
+          span[style*="color: #374151"],
+          span[style*="color: #1f2937"],
+          p[style*="color: #6b7280"],
+          p[style*="color: #4b5563"],
+          p[style*="color: #374151"],
+          p[style*="color: #1f2937"] {
+            color: #d1d5db !important;
+          }
+
+          /* Borders lighter in dark mode */
+          div[style*="border: 1px solid #e5e7eb"],
+          div[style*="borderColor: #e5e7eb"],
+          div[style*="border-color: #e5e7eb"] {
+            border-color: #374151 !important;
+          }
+
+          div[style*="border: 1px solid #d1d5db"] {
+            border-color: #4b5563 !important;
+          }
+
+          div[style*="border: 2px solid #d1d5db"] {
+            border-color: #4b5563 !important;
+          }
+
+          /* Input styling for dark mode */
+          input[type="text"],
+          input[type="number"] {
+            background: #1f2937 !important;
+            color: #f0f0f0 !important;
+            border-color: #4b5563 !important;
+          }
+
+          input[type="text"]::placeholder,
+          input[type="number"]::placeholder {
+            color: #9ca3af !important;
+          }
+
+          /* Light background sections */
+          div[style*="background: #ecfdf5"] {
+            background: #064e3b !important;
+          }
+
+          div[style*="background: #eff6ff"] {
+            background: #0c2d4c !important;
+          }
+
+          div[style*="background: #faf5ff"] {
+            background: #3b0764 !important;
+          }
+
+          div[style*="background: #f9fafb"] {
+            background: #111827 !important;
+          }
+
+          /* Error/warning colors stay visible */
+          div[style*="background: #fef2f2"] {
+            background: #7f1d1d !important;
+            color: #fecaca !important;
+          }
+
+          /* Stage cost display colors */
+          span[style*="color: #1cb353"] {
+            color: #86efac !important;
+          }
+
+          span[style*="color: #2563eb"] {
+            color: #93c5fd !important;
+          }
+
+          span[style*="color: #ed3ade"] {
+            color: #f472b6 !important;
+          }
+
+          /* Success text */
+          div[style*="color: #059669"] {
+            color: #86efac !important;
+          }
+
+          /* Warning text */
+          div[style*="color: #d97706"] {
+            color: #fbbf24 !important;
+          }
+
+          /* Tooltip background stays dark but ensure text is light */
+          div[style*="background: #0f172a"] {
+            background: #0f172a !important;
+            color: white !important;
+          }
+        }
       `}</style>
       <div style={pageStyle}>
         <div style={{ maxWidth: 980, margin: "0 auto" }}>
@@ -1023,18 +1146,6 @@ export default function App() {
             <h2 style={{ marginTop: 0, color: COLORS.stage3.text }}>Data Analysis</h2>
             <div style={{ color: "#6b7280", marginBottom: 10 }}>Costs are per sample. Total samples: <b>{totalSamples}</b></div>
 
-            <label style={{ display: "block", marginBottom: 12 }}>
-              <div style={{ fontWeight: 700 }}>HPC computing time (hours) <InfoTip text={TOOLTIPS.hpcHours} /></div>
-              <input
-                type="number"
-                value={hpcHours}
-                min={0}
-                onChange={(e) => setHpcHours(e.target.value)}
-                style={{ width: "100%", padding: 10, borderRadius: 10, border: `2px solid ${COLORS.stage3.primary}` }}
-              />
-              <div style={{ color: "#6b7280", fontSize: 12 }}>× {COSTS.hpcPerHour} credits = {((Math.max(0, Number(hpcHours) || 0)) * COSTS.hpcPerHour).toFixed(1)}</div>
-            </label>
-
             <div style={{ ...cardStyle, background: COLORS.stage3.light }}>
               <div style={{ fontWeight: 800, marginBottom: 12 }}>Analysis methods (per sample)</div>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -1046,6 +1157,7 @@ export default function App() {
                 ].map(([k, label]) => {
                   const restrictionMsg = getRestrictionMessage("analysis", k, sequencing);
                   const isDisabled = !!restrictionMsg;
+                  const hpcPerSample = COSTS.hpcHoursPerSample[k] || 0;
                   
                   return (
                     <label key={k} style={{ display: "flex", gap: 10, alignItems: "center", padding: "8px 10px", borderRadius: 10, cursor: isDisabled ? "not-allowed" : "pointer", transition: "all 0.2s ease", background: analysis[k] ? "rgba(124, 58, 237, 0.1)" : "white", opacity: isDisabled ? 0.5 : 1 }}>
@@ -1061,7 +1173,10 @@ export default function App() {
                         {label} <InfoTip text={TOOLTIPS[k]} />
                         {isDisabled && <div style={{ color: "#d97706", fontSize: 11, marginTop: 4 }}>⚠️ {restrictionMsg}</div>}
                       </span>
-                      <span style={{ color: "#6b7280", whiteSpace: "nowrap" }}>{COSTS.analysisPerSample[k]}</span>
+                      <span style={{ color: "#6b7280", whiteSpace: "nowrap" }}>
+                        <div style={{ fontSize: 12 }}>{COSTS.analysisPerSample[k]}</div>
+                        <div style={{ fontSize: 11, color: "#7c3aed", fontWeight: 600 }}>{hpcPerSample} hrs/sample</div>
+                      </span>
                     </label>
                   );
                 })}
@@ -1069,7 +1184,13 @@ export default function App() {
             </div>
 
             <div style={{ marginTop: 14, padding: 12, borderRadius: 12, background: COLORS.stage3.light, border: `1px solid ${COLORS.stage3.border}` }}>
-              <div style={{ fontWeight: 800 }}>Stage 3 Total: {stage3Cost.toFixed(1)} credits</div>
+              <div style={{ fontWeight: 800, marginBottom: 8 }}>HPC Computing Required</div>
+              <div style={{ fontSize: 14, color: COLORS.stage3.text, marginBottom: 8 }}>
+                {Object.values(analysis).some(v => v) 
+                  ? `${hpcHours.toFixed(1)} hours (${(hpcHours * COSTS.hpcPerHour).toFixed(1)} credits)`
+                  : "No analysis methods selected"}
+              </div>
+              <div style={{ fontWeight: 800, paddingTop: 8, borderTop: `1px solid ${COLORS.stage3.border}` }}>Stage 3 Total: {stage3Cost.toFixed(1)} credits</div>
             </div>
 
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 16 }}>
