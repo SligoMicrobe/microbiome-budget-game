@@ -1,0 +1,435 @@
+import { useMemo, useState } from "react";
+
+const TOTAL_BUDGET = 5000;
+
+const COSTS = {
+  // Stage 1
+  participant: 5,          // per participant
+  sampleTypePerSample: 1,  // per sample type per timepoint per participant
+  incentivePerParticipant: 2,
+
+  // Stage 2 (per sample)
+  extraction: {
+    dna: 2,
+    rna: 2,
+    metabolite: 2,
+    isolation: 2,
+  },
+  sequencing: {
+    amplicon: 2,
+    shotgun: 5,
+    rnaseq: 5,
+    metabolomics: 5,
+  },
+
+  // Stage 3
+  analysisPerSample: {
+    taxonomy: 0.5,
+    functional: 1,
+    mag: 1,
+    ml: 2,
+  },
+  hpcPerHour: 0.1,
+};
+
+function clampInt(n, min = 0) {
+  const x = Number.isFinite(n) ? n : 0;
+  return Math.max(min, Math.floor(x));
+}
+
+export default function App() {
+  // ---- Stage state ----
+  const [stage, setStage] = useState(1);
+
+  // Stage 1
+  const [participants, setParticipants] = useState(0);
+  const [timepoints, setTimepoints] = useState(1);
+  const [sampleTypes, setSampleTypes] = useState({
+    stool: false,
+    vaginal: false,
+    oral: false,
+    breastmilk: false,
+    skin: false,
+  });
+  const [incentives, setIncentives] = useState(false);
+
+  // Stage 2
+  const [extraction, setExtraction] = useState({
+    dna: false,
+    rna: false,
+    metabolite: false,
+    isolation: false,
+  });
+  const [sequencing, setSequencing] = useState({
+    amplicon: false,
+    shotgun: false,
+    rnaseq: false,
+    metabolomics: false,
+  });
+
+  // Stage 3
+  const [analysis, setAnalysis] = useState({
+    taxonomy: false,
+    functional: false,
+    mag: false,
+    ml: false,
+  });
+  const [hpcHours, setHpcHours] = useState(0);
+
+  // ---- Derived values ----
+  const selectedSampleTypeCount = useMemo(
+    () => Object.values(sampleTypes).filter(Boolean).length,
+    [sampleTypes]
+  );
+
+  const totalSamples = useMemo(() => {
+    return clampInt(participants) * clampInt(timepoints, 1) * selectedSampleTypeCount;
+  }, [participants, timepoints, selectedSampleTypeCount]);
+
+  const stage1Cost = useMemo(() => {
+    const p = clampInt(participants);
+    const t = clampInt(timepoints, 1);
+    const sampleCost = p * t * selectedSampleTypeCount * COSTS.sampleTypePerSample;
+    const recruitmentCost = p * COSTS.participant;
+    const incentiveCost = incentives ? p * COSTS.incentivePerParticipant : 0;
+    return recruitmentCost + sampleCost + incentiveCost;
+  }, [participants, timepoints, selectedSampleTypeCount, incentives]);
+
+  const stage2Cost = useMemo(() => {
+    const perSampleExtraction = Object.entries(extraction)
+      .filter(([, v]) => v)
+      .reduce((sum, [k]) => sum + COSTS.extraction[k], 0);
+
+    const perSampleSequencing = Object.entries(sequencing)
+      .filter(([, v]) => v)
+      .reduce((sum, [k]) => sum + COSTS.sequencing[k], 0);
+
+    return totalSamples * (perSampleExtraction + perSampleSequencing);
+  }, [extraction, sequencing, totalSamples]);
+
+  const stage3Cost = useMemo(() => {
+    const perSampleAnalysis = Object.entries(analysis)
+      .filter(([, v]) => v)
+      .reduce((sum, [k]) => sum + COSTS.analysisPerSample[k], 0);
+
+    const hpcCost = Math.max(0, Number(hpcHours) || 0) * COSTS.hpcPerHour;
+    return totalSamples * perSampleAnalysis + hpcCost;
+  }, [analysis, hpcHours, totalSamples]);
+
+  const totalCost = stage1Cost + stage2Cost + stage3Cost;
+  const remaining = TOTAL_BUDGET - totalCost;
+  const overBudget = remaining < 0;
+
+  function resetAll() {
+    setStage(1);
+    setParticipants(0);
+    setTimepoints(1);
+    setSampleTypes({ stool: false, vaginal: false, oral: false, breastmilk: false, skin: false });
+    setIncentives(false);
+    setExtraction({ dna: false, rna: false, metabolite: false, isolation: false });
+    setSequencing({ amplicon: false, shotgun: false, rnaseq: false, metabolomics: false });
+    setAnalysis({ taxonomy: false, functional: false, mag: false, ml: false });
+    setHpcHours(0);
+  }
+
+  const cardStyle = {
+    border: "1px solid #e5e7eb",
+    borderRadius: 12,
+    padding: 16,
+    background: "white",
+  };
+
+  const pageStyle = {
+    fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif",
+    background: "#f6f7fb",
+    minHeight: "100vh",
+    padding: 20,
+  };
+
+  const headerStyle = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 12,
+  };
+
+  return (
+    <div style={pageStyle}>
+      <div style={{ maxWidth: 980, margin: "0 auto" }}>
+        <div style={headerStyle}>
+          <div>
+            <div style={{ fontSize: 22, fontWeight: 700 }}>Microbiome Project Budget Game</div>
+            <div style={{ color: "#6b7280" }}>Design a microbiome sequencing study within budget</div>
+          </div>
+          <button onClick={resetAll} style={{ padding: "8px 12px", borderRadius: 10, border: "1px solid #d1d5db" }}>
+            Reset
+          </button>
+        </div>
+
+        <div style={{ ...cardStyle, marginBottom: 16, borderColor: overBudget ? "#ef4444" : "#e5e7eb" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+            <div>
+              <div style={{ color: "#6b7280", fontSize: 12 }}>Your Team&apos;s Budget</div>
+              <div style={{ fontSize: 18, fontWeight: 700 }}>
+                {remaining.toFixed(1)} / {TOTAL_BUDGET} credits remaining
+              </div>
+              {overBudget && (
+                <div style={{ marginTop: 6, color: "#b91c1c", fontWeight: 600 }}>
+                  Over budget! You&apos;ve exceeded your {TOTAL_BUDGET} credits by {Math.abs(remaining).toFixed(1)} credits.
+                </div>
+              )}
+            </div>
+            <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
+              <span style={{ color: "#16a34a", fontWeight: 600 }}>Stage 1: {stage1Cost.toFixed(1)}</span>
+              <span style={{ color: "#2563eb", fontWeight: 600 }}>Stage 2: {stage2Cost.toFixed(1)}</span>
+              <span style={{ color: "#7c3aed", fontWeight: 600 }}>Stage 3: {stage3Cost.toFixed(1)}</span>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ display: "flex", gap: 10, marginBottom: 12 }}>
+          {[1, 2, 3].map((s) => (
+            <button
+              key={s}
+              onClick={() => setStage(s)}
+              style={{
+                flex: 1,
+                padding: 10,
+                borderRadius: 12,
+                border: "1px solid #d1d5db",
+                background: stage === s ? "#111827" : "white",
+                color: stage === s ? "white" : "#111827",
+                fontWeight: 700,
+              }}
+            >
+              Stage {s}
+            </button>
+          ))}
+        </div>
+
+        {stage === 1 && (
+          <div style={cardStyle}>
+            <h2 style={{ marginTop: 0 }}>Recruitment & Sampling</h2>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <label>
+                <div style={{ fontWeight: 600 }}>Number of participants</div>
+                <input
+                  type="number"
+                  value={participants}
+                  min={0}
+                  onChange={(e) => setParticipants(clampInt(parseFloat(e.target.value)))}
+                  style={{ width: "100%", padding: 10, borderRadius: 10, border: "1px solid #d1d5db" }}
+                />
+                <div style={{ color: "#6b7280", fontSize: 12 }}>
+                  × {COSTS.participant} credits = {(clampInt(participants) * COSTS.participant).toFixed(1)}
+                </div>
+              </label>
+
+              <label>
+                <div style={{ fontWeight: 600 }}>Time points</div>
+                <input
+                  type="number"
+                  value={timepoints}
+                  min={1}
+                  onChange={(e) => setTimepoints(clampInt(parseFloat(e.target.value), 1))}
+                  style={{ width: "100%", padding: 10, borderRadius: 10, border: "1px solid #d1d5db" }}
+                />
+                <div style={{ color: "#6b7280", fontSize: 12 }}>collection points</div>
+              </label>
+            </div>
+
+            <div style={{ marginTop: 14, fontWeight: 700 }}>Sample types (1 credit per sample)</div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginTop: 10 }}>
+              {[
+                ["stool", "Stool sample"],
+                ["vaginal", "Vaginal swab"],
+                ["oral", "Oral swab"],
+                ["breastmilk", "Breast milk"],
+                ["skin", "Skin swab"],
+              ].map(([key, label]) => (
+                <label
+                  key={key}
+                  style={{
+                    display: "flex",
+                    gap: 10,
+                    alignItems: "center",
+                    padding: 10,
+                    borderRadius: 12,
+                    border: "1px solid #d1d5db",
+                    background: sampleTypes[key] ? "#ecfeff" : "white",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={sampleTypes[key]}
+                    onChange={(e) => setSampleTypes((prev) => ({ ...prev, [key]: e.target.checked }))}
+                  />
+                  {label}
+                </label>
+              ))}
+            </div>
+
+            {selectedSampleTypeCount === 0 && (
+              <div style={{ marginTop: 8, color: "#b45309", fontWeight: 600 }}>
+                Please select at least one sample type
+              </div>
+            )}
+
+            <label style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 16 }}>
+              <input type="checkbox" checked={incentives} onChange={(e) => setIncentives(e.target.checked)} />
+              <span style={{ fontWeight: 700 }}>Include participant incentives</span>
+              <span style={{ color: "#6b7280" }}>({COSTS.incentivePerParticipant} credits/participant)</span>
+            </label>
+
+            <div style={{ marginTop: 16, padding: 12, borderRadius: 12, background: "#ecfdf5", border: "1px solid #bbf7d0" }}>
+              <div style={{ fontWeight: 700 }}>
+                Calculation: {clampInt(participants)} participants × {clampInt(timepoints, 1)} timepoints × {selectedSampleTypeCount} sample types ={" "}
+                <span>{totalSamples}</span> total samples
+              </div>
+              <div style={{ marginTop: 6, fontWeight: 700 }}>Stage 1 Total: {stage1Cost.toFixed(1)} credits</div>
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}>
+              <button
+                onClick={() => setStage(2)}
+                style={{ padding: "10px 14px", borderRadius: 12, border: "none", background: "#16a34a", color: "white", fontWeight: 800 }}
+              >
+                Next Stage →
+              </button>
+            </div>
+          </div>
+        )}
+
+        {stage === 2 && (
+          <div style={cardStyle}>
+            <h2 style={{ marginTop: 0 }}>Data Collection</h2>
+            <div style={{ color: "#6b7280", marginBottom: 10 }}>Costs are per sample. Total samples: <b>{totalSamples}</b></div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <div style={{ ...cardStyle, background: "#f9fafb" }}>
+                <div style={{ fontWeight: 800, marginBottom: 8 }}>Extraction methods (per sample)</div>
+                {[
+                  ["dna", "DNA extraction"],
+                  ["rna", "RNA extraction"],
+                  ["metabolite", "Metabolite extraction"],
+                  ["isolation", "Microbial isolation"],
+                ].map(([k, label]) => (
+                  <label key={k} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0" }}>
+                    <span>
+                      <input
+                        type="checkbox"
+                        checked={extraction[k]}
+                        onChange={(e) => setExtraction((prev) => ({ ...prev, [k]: e.target.checked }))}
+                        style={{ marginRight: 10 }}
+                      />
+                      {label}
+                    </span>
+                    <span style={{ color: "#6b7280" }}>{COSTS.extraction[k]} credits</span>
+                  </label>
+                ))}
+              </div>
+
+              <div style={{ ...cardStyle, background: "#f9fafb" }}>
+                <div style={{ fontWeight: 800, marginBottom: 8 }}>Sequencing methods (per sample)</div>
+                {[
+                  ["amplicon", "Amplicon (16S/ITS) sequencing"],
+                  ["shotgun", "Shotgun metagenomic"],
+                  ["rnaseq", "RNAseq"],
+                  ["metabolomics", "Metabolomics"],
+                ].map(([k, label]) => (
+                  <label key={k} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0" }}>
+                    <span>
+                      <input
+                        type="checkbox"
+                        checked={sequencing[k]}
+                        onChange={(e) => setSequencing((prev) => ({ ...prev, [k]: e.target.checked }))}
+                        style={{ marginRight: 10 }}
+                      />
+                      {label}
+                    </span>
+                    <span style={{ color: "#6b7280" }}>{COSTS.sequencing[k]} credits</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ marginTop: 14, padding: 12, borderRadius: 12, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
+              <div style={{ fontWeight: 800 }}>Stage 2 Total: {stage2Cost.toFixed(1)} credits ({totalSamples} samples)</div>
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 16 }}>
+              <button onClick={() => setStage(1)} style={{ padding: "10px 14px", borderRadius: 12, border: "1px solid #d1d5db", background: "white" }}>
+                ← Previous
+              </button>
+              <button
+                onClick={() => setStage(3)}
+                style={{ padding: "10px 14px", borderRadius: 12, border: "none", background: "#2563eb", color: "white", fontWeight: 800 }}
+              >
+                Next Stage →
+              </button>
+            </div>
+          </div>
+        )}
+
+        {stage === 3 && (
+          <div style={cardStyle}>
+            <h2 style={{ marginTop: 0 }}>Data Analysis</h2>
+            <div style={{ color: "#6b7280", marginBottom: 10 }}>Costs are per sample. Total samples: <b>{totalSamples}</b></div>
+
+            <label style={{ display: "block", marginBottom: 12 }}>
+              <div style={{ fontWeight: 700 }}>HPC computing time (hours)</div>
+              <input
+                type="number"
+                value={hpcHours}
+                min={0}
+                onChange={(e) => setHpcHours(e.target.value)}
+                style={{ width: "100%", padding: 10, borderRadius: 10, border: "1px solid #d1d5db" }}
+              />
+              <div style={{ color: "#6b7280", fontSize: 12 }}>× {COSTS.hpcPerHour} credits = {((Math.max(0, Number(hpcHours) || 0)) * COSTS.hpcPerHour).toFixed(1)}</div>
+            </label>
+
+            <div style={{ ...cardStyle, background: "#faf5ff" }}>
+              <div style={{ fontWeight: 800, marginBottom: 8 }}>Analysis methods (per sample)</div>
+              {[
+                ["taxonomy", "Taxonomic profiling"],
+                ["functional", "Functional profiling"],
+                ["mag", "MAG recovery"],
+                ["ml", "Machine learning"],
+              ].map(([k, label]) => (
+                <label key={k} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0" }}>
+                  <span>
+                    <input
+                      type="checkbox"
+                      checked={analysis[k]}
+                      onChange={(e) => setAnalysis((prev) => ({ ...prev, [k]: e.target.checked }))}
+                      style={{ marginRight: 10 }}
+                    />
+                    {label}
+                  </span>
+                  <span style={{ color: "#6b7280" }}>{COSTS.analysisPerSample[k]} credits</span>
+                </label>
+              ))}
+            </div>
+
+            <div style={{ marginTop: 14, padding: 12, borderRadius: 12, background: "#faf5ff", border: "1px solid #e9d5ff" }}>
+              <div style={{ fontWeight: 800 }}>Stage 3 Total: {stage3Cost.toFixed(1)} credits</div>
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 16 }}>
+              <button onClick={() => setStage(2)} style={{ padding: "10px 14px", borderRadius: 12, border: "1px solid #d1d5db", background: "white" }}>
+                ← Previous
+              </button>
+              <button
+                onClick={() => alert("Nice! Next we can add a Study Summary screen + export/sharing.")}
+                style={{ padding: "10px 14px", borderRadius: 12, border: "none", background: "#7c3aed", color: "white", fontWeight: 800 }}
+              >
+                Complete Study Design
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
