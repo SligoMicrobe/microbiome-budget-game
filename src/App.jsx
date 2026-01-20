@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Analytics } from "@vercel/analytics/react";
 
 const TOTAL_BUDGET = 5000;
@@ -243,6 +243,18 @@ export default function App() {
   const [teamName, setTeamName] = useState("");
   const [gameStarted, setGameStarted] = useState(false);
   const [teamNameInput, setTeamNameInput] = useState("");
+  const [studyComplete, setStudyComplete] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024);
+
+  // ---- Responsive sizing ----
+  const isMobile = windowWidth < 640;
+  const isTablet = windowWidth >= 640 && windowWidth < 1024;
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // ---- Stage state ----
   const [stage, setStage] = useState(1);
@@ -358,6 +370,7 @@ export default function App() {
     setGameStarted(false);
     setTeamName("");
     setTeamNameInput("");
+    setStudyComplete(false);
     resetAll();
   }
 
@@ -372,7 +385,7 @@ export default function App() {
     fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif",
     background: "#f6f7fb",
     minHeight: "100vh",
-    padding: 20,
+    padding: isMobile ? 12 : 20,
   };
 
   // Show team name modal if game hasn't started
@@ -387,18 +400,18 @@ export default function App() {
         }}>
           <div style={{
             ...cardStyle,
-            maxWidth: 400,
-            padding: 40,
+            maxWidth: isMobile ? "90%" : 400,
+            padding: isMobile ? 24 : 40,
             textAlign: "center",
             boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
           }}>
-            <h1 style={{ marginTop: 0, color: "#111827", fontSize: 28 }}>Microbiome Budget Game</h1>
-            <p style={{ color: "#6b7280", marginBottom: 24, fontSize: 16 }}>
+            <h1 style={{ marginTop: 0, color: "#111827", fontSize: isMobile ? 22 : 28 }}>Microbiome Budget Game</h1>
+            <p style={{ color: "#6b7280", marginBottom: 24, fontSize: isMobile ? 14 : 16 }}>
               Design a microbiome sequencing study within your budget
             </p>
 
             <div style={{ marginBottom: 20 }}>
-              <label style={{ display: "block", marginBottom: 8, fontWeight: 600, color: "#374151", textAlign: "left" }}>
+              <label style={{ display: "block", marginBottom: 8, fontWeight: 600, color: "#374151", textAlign: "left", fontSize: isMobile ? 13 : 14 }}>
                 Research Team Name
               </label>
               <input
@@ -412,7 +425,7 @@ export default function App() {
                   padding: "12px 14px",
                   borderRadius: 10,
                   border: "2px solid #d1d5db",
-                  fontSize: 16,
+                  fontSize: isMobile ? 14 : 16,
                   boxSizing: "border-box",
                 }}
                 autoFocus
@@ -430,13 +443,221 @@ export default function App() {
                 background: teamNameInput.trim() ? "#16a34a" : "#d1d5db",
                 color: "white",
                 fontWeight: 800,
-                fontSize: 16,
+                fontSize: isMobile ? 14 : 16,
                 cursor: teamNameInput.trim() ? "pointer" : "not-allowed",
                 transition: "background 0.2s ease",
               }}
             >
               Start Game
             </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show study summary if complete
+  if (studyComplete) {
+    const sampleTypeLabels = {
+      stool: "Stool sample",
+      vaginal: "Vaginal swab",
+      oral: "Oral swab",
+      breastmilk: "Breast milk",
+      skin: "Skin swab",
+      tissue: "Tissue biopsy",
+    };
+
+    const extractionLabels = {
+      dna: "DNA extraction",
+      rna: "RNA extraction",
+      metabolite: "Metabolite extraction",
+      isolation: "Microbial isolation",
+    };
+
+    const sequencingLabels = {
+      amplicon: "Amplicon (16S/ITS) sequencing",
+      shotgun: "Shotgun metagenomic",
+      rnaseq: "RNAseq",
+      metabolomics: "Metabolomics",
+    };
+
+    const analysisLabels = {
+      taxonomy: "Taxonomic profiling",
+      functional: "Functional profiling",
+      mag: "MAG recovery",
+      ml: "Machine learning",
+    };
+
+    return (
+      <div style={pageStyle}>
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "100vh",
+          padding: isMobile ? "12px" : "20px",
+        }}>
+          <div style={{
+            ...cardStyle,
+            maxWidth: isMobile ? "95%" : 700,
+            boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
+            maxHeight: "90vh",
+            overflowY: "auto",
+          }}>
+            <h1 style={{ marginTop: 0, color: COLORS.stage1.text, fontSize: isMobile ? 20 : 26 }}>Study Design Summary</h1>
+            <p style={{ color: "#6b7280", marginBottom: 20, fontSize: isMobile ? 13 : 14 }}>Team: <strong>{teamName}</strong></p>
+
+            <div style={{ borderTop: "1px solid #e5e7eb", paddingTop: 16 }}>
+              <h3 style={{ color: COLORS.stage1.text, marginTop: 0, fontSize: isMobile ? 16 : 18 }}>Research Design</h3>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, fontSize: isMobile ? 13 : 14 }} data-grid="summary-grid">
+                <div>
+                  <div style={{ color: "#6b7280", fontSize: 12 }}>Study Subject</div>
+                  <div style={{ fontWeight: 600 }}>
+                    {participantType === "mice" ? "Mouse models" : "Human subjects"}
+                  </div>
+                </div>
+                <div>
+                  <div style={{ color: "#6b7280", fontSize: 12 }}>Sample Count</div>
+                  <div style={{ fontWeight: 600 }}>
+                    {clampInt(participants)} {participantType === "mice" ? "mice" : "participants"} × {clampInt(timepoints, 1)} timepoints = {totalSamples} total samples
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ borderTop: "1px solid #e5e7eb", paddingTop: 16, marginTop: 16 }}>
+              <h3 style={{ color: COLORS.stage1.text, marginTop: 0, fontSize: isMobile ? 16 : 18 }}>Sample Collection</h3>
+              <div style={{ fontSize: isMobile ? 13 : 14 }}>
+                <div style={{ fontWeight: 600, marginBottom: 8 }}>Sample Types Selected:</div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                  {Object.entries(sampleTypes)
+                    .filter(([, selected]) => selected)
+                    .map(([key]) => (
+                      <span
+                        key={key}
+                        style={{
+                          background: COLORS.stage1.light,
+                          color: COLORS.stage1.text,
+                          padding: "6px 12px",
+                          borderRadius: 6,
+                          fontSize: 13,
+                          fontWeight: 500,
+                        }}
+                      >
+                        {sampleTypeLabels[key]}
+                      </span>
+                    ))}
+                </div>
+                {incentives && (
+                  <div style={{ marginTop: 8, color: "#059669", fontWeight: 600 }}>
+                    ✓ Participant incentives included
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div style={{ borderTop: "1px solid #e5e7eb", paddingTop: 16, marginTop: 16 }}>
+              <h3 style={{ color: COLORS.stage2.text, marginTop: 0, fontSize: isMobile ? 16 : 18 }}>Data Collection</h3>
+              <div style={{ fontSize: isMobile ? 13 : 14 }}>
+                <div style={{ marginBottom: 12 }}>
+                  <div style={{ fontWeight: 600, marginBottom: 6 }}>Extraction Methods:</div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                    {Object.entries(extraction)
+                      .filter(([, selected]) => selected)
+                      .map(([key]) => (
+                        <span key={key} style={{ background: "#dbeafe", color: COLORS.stage2.text, padding: "6px 12px", borderRadius: 6, fontSize: 13, fontWeight: 500 }}>
+                          {extractionLabels[key]}
+                        </span>
+                      ))}
+                    {Object.values(extraction).every(v => !v) && <span style={{ color: "#6b7280", fontStyle: "italic" }}>None selected</span>}
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontWeight: 600, marginBottom: 6 }}>Sequencing Methods:</div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                    {Object.entries(sequencing)
+                      .filter(([, selected]) => selected)
+                      .map(([key]) => (
+                        <span key={key} style={{ background: "#dbeafe", color: COLORS.stage2.text, padding: "6px 12px", borderRadius: 6, fontSize: 13, fontWeight: 500 }}>
+                          {sequencingLabels[key]}
+                        </span>
+                      ))}
+                    {Object.values(sequencing).every(v => !v) && <span style={{ color: "#6b7280", fontStyle: "italic" }}>None selected</span>}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ borderTop: "1px solid #e5e7eb", paddingTop: 16, marginTop: 16 }}>
+              <h3 style={{ color: COLORS.stage3.text, marginTop: 0, fontSize: isMobile ? 16 : 18 }}>Data Analysis</h3>
+              <div style={{ fontSize: isMobile ? 13 : 14 }}>
+                <div style={{ marginBottom: 12 }}>
+                  <div style={{ fontWeight: 600, marginBottom: 6 }}>Analysis Methods:</div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                    {Object.entries(analysis)
+                      .filter(([, selected]) => selected)
+                      .map(([key]) => (
+                        <span key={key} style={{ background: "#f3e8ff", color: COLORS.stage3.text, padding: "6px 12px", borderRadius: 6, fontSize: 13, fontWeight: 500 }}>
+                          {analysisLabels[key]}
+                        </span>
+                      ))}
+                    {Object.values(analysis).every(v => !v) && <span style={{ color: "#6b7280", fontStyle: "italic" }}>None selected</span>}
+                  </div>
+                </div>
+                {clampInt(hpcHours, 0) > 0 && (
+                  <div style={{ color: "#7c3aed", fontWeight: 600 }}>
+                    HPC Computing: {clampInt(hpcHours, 0)} hours
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div style={{ borderTop: "1px solid #e5e7eb", paddingTop: 16, marginTop: 16, background: overBudget ? "#fef2f2" : COLORS.stage1.light, padding: 16, borderRadius: 12 }}>
+              <h3 style={{ marginTop: 0, color: overBudget ? "#b91c1c" : COLORS.stage1.text, fontSize: isMobile ? 16 : 18 }}>Budget Summary</h3>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, fontSize: isMobile ? 13 : 14, marginBottom: 12 }} data-grid="summary-grid">
+                <div>
+                  <div style={{ color: "#6b7280", fontSize: 12 }}>Stage 1: Recruitment & Sampling</div>
+                  <div style={{ fontWeight: 700, fontSize: 16 }}>{stage1Cost.toFixed(1)} credits</div>
+                </div>
+                <div>
+                  <div style={{ color: "#6b7280", fontSize: 12 }}>Stage 2: Data Collection</div>
+                  <div style={{ fontWeight: 700, fontSize: 16 }}>{stage2Cost.toFixed(1)} credits</div>
+                </div>
+                <div>
+                  <div style={{ color: "#6b7280", fontSize: 12 }}>Stage 3: Data Analysis</div>
+                  <div style={{ fontWeight: 700, fontSize: 16 }}>{stage3Cost.toFixed(1)} credits</div>
+                </div>
+                <div>
+                  <div style={{ color: "#6b7280", fontSize: 12 }}>Total Budget</div>
+                  <div style={{ fontWeight: 700, fontSize: 16 }}>{TOTAL_BUDGET} credits</div>
+                </div>
+              </div>
+              <div style={{ borderTop: "2px solid " + (overBudget ? "#fca5a5" : COLORS.stage1.border), paddingTop: 12, marginTop: 12 }}>
+                <div style={{ fontSize: 18, fontWeight: 800, color: overBudget ? "#b91c1c" : "#059669" }}>
+                  {overBudget ? "❌ Over Budget" : "✓ Within Budget"}
+                </div>
+                <div style={{ fontSize: 16, fontWeight: 700, marginTop: 6, color: overBudget ? "#b91c1c" : COLORS.stage1.text }}>
+                  {overBudget
+                    ? `Over by ${Math.abs(remaining).toFixed(1)} credits`
+                    : `${remaining.toFixed(1)} credits remaining`}
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: "flex", gap: 12, marginTop: 20, justifyContent: "space-between", flexDirection: isMobile ? "column" : "row" }}>
+              <button
+                onClick={() => setStudyComplete(false)}
+                style={{ flex: 1, padding: "12px 16px", borderRadius: 12, border: "1px solid #d1d5db", background: "white", fontWeight: 600, cursor: "pointer" }}
+              >
+                ← Edit Design
+              </button>
+              <button
+                onClick={restartGame}
+                style={{ flex: 1, padding: "12px 16px", borderRadius: 12, border: "none", background: COLORS.stage1.primary, color: "white", fontWeight: 800, cursor: "pointer" }}
+              >
+                New Study
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -452,20 +673,66 @@ export default function App() {
 
   return (
     <>
+      <style>{`
+        @media (max-width: 639px) {
+          div[data-grid="sample-types"] {
+            grid-template-columns: repeat(1, 1fr) !important;
+          }
+          div[data-grid="stage2-layout"] {
+            grid-template-columns: 1fr !important;
+          }
+          div[data-grid="summary-grid"] {
+            grid-template-columns: 1fr !important;
+          }
+          div[data-grid="header"] {
+            flex-direction: column;
+            gap: 12px;
+          }
+          div[data-grid="budget-row"] {
+            flex-direction: column;
+            gap: 8px;
+          }
+          button[data-stage-btn] {
+            padding: 8px 6px !important;
+            font-size: 13px !important;
+          }
+        }
+        @media (min-width: 640px) and (max-width: 1023px) {
+          div[data-grid="sample-types"] {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+        }
+        @media (min-width: 1024px) {
+          div[data-grid="sample-types"] {
+            grid-template-columns: repeat(3, 1fr) !important;
+          }
+          div[data-grid="stage2-layout"] {
+            grid-template-columns: 1fr 1fr !important;
+          }
+          div[data-grid="summary-grid"] {
+            grid-template-columns: 1fr 1fr !important;
+          }
+        }
+        @media (max-width: 639px) {
+          h1 { font-size: 20px !important; }
+          h2 { font-size: 18px !important; }
+          h3 { font-size: 16px !important; }
+        }
+      `}</style>
       <div style={pageStyle}>
         <div style={{ maxWidth: 980, margin: "0 auto" }}>
-        <div style={headerStyle}>
+        <div style={headerStyle} data-grid="header">
           <div>
-            <div style={{ fontSize: 22, fontWeight: 700 }}>Microbiome Project Budget Game</div>
-            <div style={{ color: "#6b7280" }}>Team: <strong>{teamName}</strong></div>
+            <div style={{ fontSize: isMobile ? 18 : 22, fontWeight: 700 }}>Microbiome Project Budget Game</div>
+            <div style={{ color: "#6b7280", fontSize: isMobile ? 12 : 14 }}>Team: <strong>{teamName}</strong></div>
           </div>
-          <button onClick={restartGame} style={{ padding: "8px 12px", borderRadius: 10, border: "1px solid #d1d5db" }}>
+          <button onClick={restartGame} style={{ padding: "8px 12px", borderRadius: 10, border: "1px solid #d1d5db", fontSize: isMobile ? 13 : 14 }}>
             New Game
           </button>
         </div>
 
         <div style={{ ...cardStyle, marginBottom: 16, borderColor: overBudget ? "#ef4444" : "#e5e7eb" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }} data-grid="budget-row">
             <div>
               <div style={{ color: "#6b7280", fontSize: 12 }}>Your Team&apos;s Budget</div>
               <div style={{ fontSize: 18, fontWeight: 700 }}>
@@ -477,10 +744,10 @@ export default function App() {
                 </div>
               )}
             </div>
-            <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
-              <span style={{ color: "#1cb353", fontWeight: 600 }}>Stage 1: {stage1Cost.toFixed(1)}</span>
-              <span style={{ color: "#2563eb", fontWeight: 600 }}>Stage 2: {stage2Cost.toFixed(1)}</span>
-              <span style={{ color: "#ed3ade", fontWeight: 600 }}>Stage 3: {stage3Cost.toFixed(1)}</span>
+            <div style={{ display: "flex", gap: isMobile ? 8 : 14, alignItems: "center", flexWrap: "wrap" }}>
+              <span style={{ color: "#1cb353", fontWeight: 600, fontSize: isMobile ? 12 : 14 }}>Stage 1: {stage1Cost.toFixed(1)}</span>
+              <span style={{ color: "#2563eb", fontWeight: 600, fontSize: isMobile ? 12 : 14 }}>Stage 2: {stage2Cost.toFixed(1)}</span>
+              <span style={{ color: "#ed3ade", fontWeight: 600, fontSize: isMobile ? 12 : 14 }}>Stage 3: {stage3Cost.toFixed(1)}</span>
             </div>
           </div>
 
@@ -524,17 +791,19 @@ export default function App() {
             <button
               key={s}
               onClick={() => setStage(s)}
+              data-stage-btn
               style={{
                 flex: 1,
-                padding: 10,
+                padding: isMobile ? 8 : 10,
                 borderRadius: 12,
                 border: `2px solid ${COLORS[`stage${s}`].primary}`,
                 background: stage === s ? COLORS[`stage${s}`].primary : "white",
                 color: stage === s ? "white" : COLORS[`stage${s}`].primary,
                 fontWeight: 700,
+                fontSize: isMobile ? 13 : 14,
               }}
             >
-              Stage {s}
+              {isMobile ? `S${s}` : `Stage ${s}`}
             </button>
           ))}
         </div>
@@ -593,8 +862,8 @@ export default function App() {
               </label>
             </div>
 
-            <div style={{ marginTop: 14, fontWeight: 700 }}>Sample types <InfoTip text={TOOLTIPS.sampleTypes} /></div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginTop: 10 }}>
+            <div style={{ marginTop: 14, fontWeight: 700, fontSize: isMobile ? 14 : 16 }}>Sample types <InfoTip text={TOOLTIPS.sampleTypes} /></div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: isMobile ? 8 : 10, marginTop: 10 }} data-grid="sample-types">
               {[
                 ["stool", "Stool sample"],
                 ["vaginal", "Vaginal swab"],
@@ -612,7 +881,7 @@ export default function App() {
                       flexDirection: "column",
                       gap: 8,
                       alignItems: "center",
-                      padding: 12,
+                      padding: isMobile ? 10 : 12,
                       borderRadius: 12,
                       border: `2px solid ${sampleTypes[key] ? COLORS.stage1.primary : "#d1d5db"}`,
                       background: sampleTypes[key] ? COLORS.stage1.light : "white",
@@ -620,9 +889,9 @@ export default function App() {
                       transition: "all 0.2s ease",
                     }}
                   >
-                    <img src={ICONS[key]} alt={label} style={{ width: 48, height: 48, objectFit: "contain" }} />
-                    <span style={{ fontSize: 13, fontWeight: 500, textAlign: "center" }}>{label}</span>
-                    <span style={{ fontSize: 11, color: "#6b7280" }}>{cost} credits/sample</span>
+                    <img src={ICONS[key]} alt={label} style={{ width: isMobile ? 40 : 48, height: isMobile ? 40 : 48, objectFit: "contain" }} />
+                    <span style={{ fontSize: isMobile ? 12 : 13, fontWeight: 500, textAlign: "center" }}>{label}</span>
+                    <span style={{ fontSize: isMobile ? 10 : 11, color: "#6b7280" }}>{cost} credits/sample</span>
                     <input
                       type="checkbox"
                       checked={sampleTypes[key]}
@@ -670,7 +939,7 @@ export default function App() {
             <h2 style={{ marginTop: 0, color: COLORS.stage2.text }}>Data Collection</h2>
             <div style={{ color: "#6b7280", marginBottom: 10 }}>Costs are per sample. Total samples: <b>{totalSamples}</b></div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }} data-grid="stage2-layout">
               <div style={{ ...cardStyle, background: "#f9fafb" }}>
                 <div style={{ fontWeight: 800, marginBottom: 12 }}>Extraction methods (per sample) <InfoTip text={TOOLTIPS.extraction} /></div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -735,7 +1004,7 @@ export default function App() {
               <div style={{ fontWeight: 800 }}>Stage 2 Total: {stage2Cost.toFixed(1)} credits ({totalSamples} samples)</div>
             </div>
 
-            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 16 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 16, gap: 10, flexWrap: isMobile ? "wrap" : "nowrap" }}>
               <button onClick={() => setStage(1)} style={{ padding: "10px 14px", borderRadius: 12, border: "1px solid #d1d5db", background: "white" }}>
                 ← Previous
               </button>
@@ -808,7 +1077,7 @@ export default function App() {
                 ← Previous
               </button>
               <button
-                onClick={() => alert("Nice! Next we can add a Study Summary screen + export/sharing.")}
+                onClick={() => setStudyComplete(true)}
                 style={{ padding: "10px 14px", borderRadius: 12, border: "none", background: COLORS.stage3.primary, color: "white", fontWeight: 800 }}
               >
                 Complete Study Design
