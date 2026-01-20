@@ -191,13 +191,14 @@ function InfoTip({ text }) {
         onBlur={() => setOpen(false)}
         onClick={() => setOpen((v) => !v)}
         aria-label="More info"
+        className="info-tip-btn"
         style={{
           width: 18,
           height: 18,
           borderRadius: 999,
           border: "1px solid #cbd5e1",
-          background: "white",
-          color: "#334155",
+          background: "#f3f4f6",
+          color: "#1f2937",
           fontSize: 12,
           lineHeight: "16px",
           fontWeight: 800,
@@ -839,6 +840,13 @@ export default function App() {
           div[style*="background: #0f172a"] {
             background: #0f172a !important;
             color: white !important;
+          }
+
+          /* Info tip button in dark mode */
+          button.info-tip-btn {
+            background: #374151 !important;
+            color: #e5e7eb !important;
+            border-color: #4b5563 !important;
           }
         }
       `}</style>
