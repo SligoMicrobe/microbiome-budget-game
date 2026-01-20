@@ -119,9 +119,48 @@ const COSTS = {
   hpcPerHour: 0.1,
 };
 
+const RESTRICTIONS = {
+  sequencing: {
+    amplicon: {
+      requires: ["dna"],
+      message: "Amplicon sequencing requires DNA extraction",
+    },
+    shotgun: {
+      requires: ["dna"],
+      message: "Shotgun sequencing requires DNA extraction",
+    },
+    rnaseq: {
+      requires: ["rna"],
+      message: "RNAseq requires RNA extraction",
+    },
+    metabolomics: {
+      requires: ["metabolite"],
+      message: "Metabolomics requires metabolite extraction",
+    },
+  },
+  analysis: {
+    functional: {
+      requires: ["shotgun"],
+      message: "Functional profiling requires shotgun sequencing",
+    },
+    mag: {
+      requires: ["shotgun"],
+      message: "MAG recovery requires shotgun sequencing",
+    },
+  },
+};
+
 function clampInt(n, min = 0) {
   const x = Number.isFinite(n) ? n : 0;
   return Math.max(min, Math.floor(x));
+}
+
+function getRestrictionMessage(category, key, currentState) {
+  const restriction = RESTRICTIONS[category]?.[key];
+  if (!restriction) return null;
+  
+  const isBlocked = !restriction.requires.every(req => currentState[req]);
+  return isBlocked ? restriction.message : null;
 }
 
 function InfoTip({ text }) {
@@ -620,21 +659,28 @@ export default function App() {
                     ["shotgun", "Shotgun metagenomic"],
                     ["rnaseq", "RNAseq"],
                     ["metabolomics", "Metabolomics"],
-                  ].map(([k, label]) => (
-                    <label key={k} style={{ display: "flex", gap: 10, alignItems: "center", padding: "8px 10px", borderRadius: 10, cursor: "pointer", transition: "all 0.2s ease", background: sequencing[k] ? "rgba(37, 99, 235, 0.1)" : "white" }}>
-                      <img src={ICONS[k]} alt={label} style={{ width: 32, height: 32, objectFit: "contain", flexShrink: 0 }} />
-                      <span style={{ flex: 1 }}>
-                        <input
-                          type="checkbox"
-                          checked={sequencing[k]}
-                          onChange={(e) => setSequencing((prev) => ({ ...prev, [k]: e.target.checked }))}
-                          style={{ marginRight: 8 }}
-                        />
-                        {label} <InfoTip text={TOOLTIPS[k]} />
-                      </span>
-                      <span style={{ color: "#6b7280", whiteSpace: "nowrap" }}>{COSTS.sequencing[k]}</span>
-                    </label>
-                  ))}
+                  ].map(([k, label]) => {
+                    const restrictionMsg = getRestrictionMessage("sequencing", k, extraction);
+                    const isDisabled = !!restrictionMsg;
+                    
+                    return (
+                      <label key={k} style={{ display: "flex", gap: 10, alignItems: "center", padding: "8px 10px", borderRadius: 10, cursor: isDisabled ? "not-allowed" : "pointer", transition: "all 0.2s ease", background: sequencing[k] ? "rgba(37, 99, 235, 0.1)" : "white", opacity: isDisabled ? 0.5 : 1 }}>
+                        <img src={ICONS[k]} alt={label} style={{ width: 32, height: 32, objectFit: "contain", flexShrink: 0 }} />
+                        <span style={{ flex: 1 }}>
+                          <input
+                            type="checkbox"
+                            checked={sequencing[k]}
+                            onChange={(e) => setSequencing((prev) => ({ ...prev, [k]: e.target.checked }))}
+                            style={{ marginRight: 8 }}
+                            disabled={isDisabled}
+                          />
+                          {label} <InfoTip text={TOOLTIPS[k]} />
+                          {isDisabled && <div style={{ color: "#d97706", fontSize: 11, marginTop: 4 }}>⚠️ {restrictionMsg}</div>}
+                        </span>
+                        <span style={{ color: "#6b7280", whiteSpace: "nowrap" }}>{COSTS.sequencing[k]}</span>
+                      </label>
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -682,21 +728,28 @@ export default function App() {
                   ["functional", "Functional profiling"],
                   ["mag", "MAG recovery"],
                   ["ml", "Machine learning"],
-                ].map(([k, label]) => (
-                  <label key={k} style={{ display: "flex", gap: 10, alignItems: "center", padding: "8px 10px", borderRadius: 10, cursor: "pointer", transition: "all 0.2s ease", background: analysis[k] ? "rgba(124, 58, 237, 0.1)" : "white" }}>
-                    <img src={ICONS[k]} alt={label} style={{ width: 32, height: 32, objectFit: "contain", flexShrink: 0 }} />
-                    <span style={{ flex: 1 }}>
-                      <input
-                        type="checkbox"
-                        checked={analysis[k]}
-                        onChange={(e) => setAnalysis((prev) => ({ ...prev, [k]: e.target.checked }))}
-                        style={{ marginRight: 8 }}
-                      />
-                      {label} <InfoTip text={TOOLTIPS[k]} />
-                    </span>
-                    <span style={{ color: "#6b7280", whiteSpace: "nowrap" }}>{COSTS.analysisPerSample[k]}</span>
-                  </label>
-                ))}
+                ].map(([k, label]) => {
+                  const restrictionMsg = getRestrictionMessage("analysis", k, sequencing);
+                  const isDisabled = !!restrictionMsg;
+                  
+                  return (
+                    <label key={k} style={{ display: "flex", gap: 10, alignItems: "center", padding: "8px 10px", borderRadius: 10, cursor: isDisabled ? "not-allowed" : "pointer", transition: "all 0.2s ease", background: analysis[k] ? "rgba(124, 58, 237, 0.1)" : "white", opacity: isDisabled ? 0.5 : 1 }}>
+                      <img src={ICONS[k]} alt={label} style={{ width: 32, height: 32, objectFit: "contain", flexShrink: 0 }} />
+                      <span style={{ flex: 1 }}>
+                        <input
+                          type="checkbox"
+                          checked={analysis[k]}
+                          onChange={(e) => setAnalysis((prev) => ({ ...prev, [k]: e.target.checked }))}
+                          style={{ marginRight: 8 }}
+                          disabled={isDisabled}
+                        />
+                        {label} <InfoTip text={TOOLTIPS[k]} />
+                        {isDisabled && <div style={{ color: "#d97706", fontSize: 11, marginTop: 4 }}>⚠️ {restrictionMsg}</div>}
+                      </span>
+                      <span style={{ color: "#6b7280", whiteSpace: "nowrap" }}>{COSTS.analysisPerSample[k]}</span>
+                    </label>
+                  );
+                })}
               </div>
             </div>
 
