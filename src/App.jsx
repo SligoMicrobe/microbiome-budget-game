@@ -183,33 +183,6 @@ function getRestrictionMessage(category, key, currentState) {
 
 function InfoTip({ text }) {
   const [open, setOpen] = useState(false);
-  const tooltipId = `tooltip-${Math.random().toString(36).substr(2, 9)}`;
-
-  // Handle escape key
-  useEffect(() => {
-    const handleEscape = (e) => {
-      if (e.key === 'Escape' && open) {
-        setOpen(false);
-      }
-    };
-    if (open) {
-      document.addEventListener('keydown', handleEscape);
-      return () => document.removeEventListener('keydown', handleEscape);
-    }
-  }, [open]);
-
-  // Handle click outside
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (open && !e.target.closest('[role="tooltip"], button[aria-describedby]')) {
-        setOpen(false);
-      }
-    };
-    if (open) {
-      document.addEventListener('click', handleClickOutside);
-      return () => document.removeEventListener('click', handleClickOutside);
-    }
-  }, [open]);
 
   return (
     <span style={{ position: "relative", display: "inline-block", marginLeft: 6 }}>
@@ -220,8 +193,7 @@ function InfoTip({ text }) {
         onFocus={() => setOpen(true)}
         onBlur={() => setOpen(false)}
         onClick={() => setOpen((v) => !v)}
-        aria-label="More information"
-        aria-describedby={open ? tooltipId : undefined}
+        aria-label="More info"
         className="info-tip-btn"
         style={{
           width: 18,
@@ -235,8 +207,6 @@ function InfoTip({ text }) {
           fontWeight: 800,
           cursor: "pointer",
           padding: 0,
-          outline: "2px solid transparent",
-          outlineOffset: "2px",
         }}
       >
         i
@@ -244,7 +214,6 @@ function InfoTip({ text }) {
 
       {open && (
         <div
-          id={tooltipId}
           role="tooltip"
           style={{
             position: "absolute",
@@ -719,30 +688,6 @@ export default function App() {
   return (
     <>
       <style>{`
-        * {
-          box-sizing: border-box;
-        }
-
-        label {
-          outline: 2px solid transparent;
-          outline-offset: 2px;
-        }
-
-        label:focus-within {
-          outline: 2px solid #2563eb;
-          outline-offset: 2px;
-        }
-
-        input:focus {
-          outline: 2px solid #2563eb;
-          outline-offset: 2px;
-        }
-
-        button:focus {
-          outline: 2px solid #2563eb;
-          outline-offset: 2px;
-        }
-
         @media (max-width: 639px) {
           div[data-grid="sample-types"] {
             grid-template-columns: repeat(1, 1fr) !important;
@@ -790,15 +735,34 @@ export default function App() {
 
         /* Dark mode support */
         @media (prefers-color-scheme: dark) {
-          .app-root {
-            background: #111827 !important;
+          * {
             color-scheme: dark;
           }
 
-          /* Card backgrounds */
-          .app-root > div[style*="border"] {
+          body, div[style*="background: #f6f7fb"] {
+            background: #111827 !important;
+          }
+
+          /* Main page background */
+          div[style*="pageStyle"] {
+            background: #111827 !important;
+          }
+          
+          /* All cards and white backgrounds */
+          div[style*="background: white"],
+          div[style*="background:white"] {
             background: #1f2937 !important;
             border-color: #374151 !important;
+          }
+
+          /* Borders lighter in dark mode */
+          div[style*="border: 1px solid #e5e7eb"],
+          div[style*="border: 2px solid #e5e7eb"],
+          div[style*="border: 1px solid #d1d5db"],
+          div[style*="border: 2px solid #d1d5db"],
+          div[style*="borderColor: #e5e7eb"],
+          div[style*="border-color: #e5e7eb"] {
+            border-color: #4b5563 !important;
           }
 
           /* Input styling for dark mode */
@@ -812,17 +776,38 @@ export default function App() {
             accent-color: #16a34a !important;
           }
 
-          input[type="text"]:focus,
-          input[type="number"]:focus,
-          input[type="radio"]:focus,
-          input[type="checkbox"]:focus {
-            outline: 2px solid #60a5fa !important;
-            outline-offset: 2px !important;
-          }
-
           input[type="text"]::placeholder,
           input[type="number"]::placeholder {
             color: #9ca3af !important;
+          }
+
+          /* Light background sections - convert to dark */
+          div[style*="background: #ecfdf5"],
+          div[style*="background: #eff6ff"],
+          div[style*="background: #faf5ff"],
+          div[style*="background: #f9fafb"],
+          div[style*="background: #dbeafe"],
+          div[style*="background: #f3e8ff"] {
+            background: #1f2937 !important;
+          }
+
+          /* Error/warning colors stay visible */
+          div[style*="background: #fef2f2"] {
+            background: #7f1d1d !important;
+            color: #fecaca !important;
+          }
+
+          /* Tooltip background stays dark but ensure text is light */
+          div[style*="background: #0f172a"] {
+            background: #0f172a !important;
+            color: white !important;
+          }
+
+          /* Info tip button in dark mode */
+          button.info-tip-btn {
+            background: #374151 !important;
+            color: #e5e7eb !important;
+            border-color: #4b5563 !important;
           }
 
           /* Buttons */
@@ -832,36 +817,37 @@ export default function App() {
             border-color: #4b5563 !important;
           }
 
-          button:focus {
-            outline: 2px solid #60a5fa !important;
-            outline-offset: 2px !important;
+          /* Colored stage buttons */
+          button[style*="border: 2px solid"] {
+            background: #1f2937 !important;
           }
 
-          label:focus-within {
-            outline: 2px solid #60a5fa !important;
-            outline-offset: 2px !important;
+          button[style*="background: #16a34a"],
+          button[style*="background: #2563eb"],
+          button[style*="background: #7c3aed"] {
+            background: inherit !important;
+            color: white !important;
           }
 
+          /* Progress bar background */
+          div[style*="background: #e5e7eb"] {
+            background: #374151 !important;
+          }
+
+          /* Disabled button */
           button:disabled {
             background: #4b5563 !important;
             color: #9ca3af !important;
           }
 
-          /* Info tip button styling */
-          button.info-tip-btn {
-            background: #374151 !important;
-            color: #e5e7eb !important;
+          /* Lock icon background in dark mode */
+          div[style*="background: white"][style*="border: 1px solid #d1d5db"] {
+            background: #2d3748 !important;
             border-color: #4b5563 !important;
-          }
-
-          /* Tooltip styling */
-          div[role="tooltip"] {
-            background: #0f172a !important;
-            color: white !important;
           }
         }
       `}</style>
-      <div style={pageStyle} className="app-root">
+      <div style={pageStyle}>
         <div style={{ maxWidth: 980, margin: "0 auto" }}>
         <div style={headerStyle} data-grid="header">
           <div>
@@ -878,7 +864,7 @@ export default function App() {
             <div>
               <div style={{ color: "#374151", fontSize: 12 }}>Your Team&apos;s Budget</div>
               <div style={{ fontSize: 18, fontWeight: 700 }}>
-                {Math.max(0, remaining).toFixed(1)} / {TOTAL_BUDGET} credits remaining
+                {remaining.toFixed(1)} / {TOTAL_BUDGET} credits remaining
               </div>
               {overBudget && (
                 <div style={{ marginTop: 6, color: "#b91c1c", fontWeight: 600 }}>
@@ -955,7 +941,7 @@ export default function App() {
             <h2 style={{ marginTop: 0, color: "#000000" }}>Recruitment & Sampling</h2>
 
             <div style={{ ...cardStyle, background: COLORS.stage1.light, marginBottom: 14 }}>
-              <div style={{ fontWeight: 800, marginBottom: 12, color: "white" }}>Study Subject <InfoTip text="Choose between mouse models (cheaper) or human subjects (more expensive, more relevant for human disease)" /></div>
+              <div style={{ fontWeight: 800, marginBottom: 12, color: "#000000" }}>Study Subject <InfoTip text="Choose between mouse models (cheaper) or human subjects (more expensive, more relevant for human disease)" /></div>
               <div style={{ display: "flex", gap: 16 }}>
                 {[
                   ["mice", "Mouse models", "2 credits/subject"],
@@ -977,8 +963,8 @@ export default function App() {
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-              <label style={{ outline: "none" }}>
-                <div style={{ fontWeight: 600, color: "#1f2937" }}>Number of {participantType === "mice" ? "mice" : "participants"} <InfoTip text={TOOLTIPS.participants} /></div>
+              <label>
+                <div style={{ fontWeight: 600, color: "#000000" }}>Number of {participantType === "mice" ? "mice" : "participants"} <InfoTip text={TOOLTIPS.participants} /></div>
                 <input
                   type="number"
                   value={participants}
@@ -991,8 +977,8 @@ export default function App() {
                 </div>
               </label>
 
-              <label style={{ outline: "none" }}>
-                <div style={{ fontWeight: 600, color: "#1f2937" }}>Time points <InfoTip text={TOOLTIPS.timepoints} /></div>
+              <label>
+                <div style={{ fontWeight: 600, color: "#000000" }}>Time points <InfoTip text={TOOLTIPS.timepoints} /></div>
                 <input
                   type="number"
                   value={timepoints}
@@ -1004,7 +990,7 @@ export default function App() {
               </label>
             </div>
 
-            <div style={{ marginTop: 14, fontWeight: 700, fontSize: isMobile ? 14 : 16, color: "#1f2937" }}>Sample types <InfoTip text={TOOLTIPS.sampleTypes} /></div>
+            <div style={{ marginTop: 14, fontWeight: 700, fontSize: isMobile ? 14 : 16, color: "#000000" }}>Sample types <InfoTip text={TOOLTIPS.sampleTypes} /></div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: isMobile ? 8 : 10, marginTop: 10 }} data-grid="sample-types">
               {[
                 ["stool", "Stool sample"],
@@ -1032,7 +1018,7 @@ export default function App() {
                     }}
                   >
                     <img src={ICONS[key]} alt={label} style={{ width: isMobile ? 40 : 48, height: isMobile ? 40 : 48, objectFit: "contain" }} />
-                    <span style={{ fontSize: isMobile ? 12 : 13, fontWeight: 500, textAlign: "center", color: sampleTypes[key] ? "white" : "#1f2937" }}>{label}</span>
+                    <span style={{ fontSize: isMobile ? 12 : 13, fontWeight: 500, textAlign: "center", color: "#000000" }}>{label}</span>
                     <span style={{ fontSize: isMobile ? 10 : 11, color: "#4b5563" }}>{cost} credits/sample</span>
                     <input
                       type="checkbox"
@@ -1058,11 +1044,11 @@ export default function App() {
             </label>
 
             <div style={{ marginTop: 16, padding: 12, borderRadius: 12, background: COLORS.stage1.light, border: `1px solid ${COLORS.stage1.border}` }}>
-              <div style={{ fontWeight: 700, color: "white" }}>
+              <div style={{ fontWeight: 700, color: "#000000" }}>
                 Calculation: {clampInt(participants)} participants × {clampInt(timepoints, 1)} timepoints × {selectedSampleTypeCount} sample types ={" "}
                 <span>{totalSamples}</span> total samples
               </div>
-              <div style={{ marginTop: 6, fontWeight: 700, color: "white" }}>Stage 1 Total: {stage1Cost.toFixed(1)} credits</div>
+              <div style={{ marginTop: 6, fontWeight: 700, color: "#000000" }}>Stage 1 Total: {stage1Cost.toFixed(1)} credits</div>
             </div>
 
             <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}>
@@ -1080,11 +1066,11 @@ export default function App() {
         {stage === 2 && (
           <div style={cardStyle}>
             <h2 style={{ marginTop: 0, color: "#000000" }}>Data Collection</h2>
-            <div style={{ color: "#1f2937", marginBottom: 10 }}>Costs are per sample. Total samples: <b>{totalSamples}</b></div>
+            <div style={{ color: "#000000", marginBottom: 10 }}>Costs are per sample. Total samples: <b>{totalSamples}</b></div>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }} data-grid="stage2-layout">
               <div style={{ ...cardStyle, background: COLORS.stage2.light }}>
-                <div style={{ fontWeight: 800, marginBottom: 12, color: "white" }}>Extraction methods (per sample) <InfoTip text={TOOLTIPS.extraction} /></div>
+                <div style={{ fontWeight: 800, marginBottom: 12, color: "#000000" }}>Extraction methods (per sample) <InfoTip text={TOOLTIPS.extraction} /></div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   {[
                     ["dna", "DNA extraction"],
@@ -1092,7 +1078,7 @@ export default function App() {
                     ["metabolite", "Metabolite extraction"],
                     ["isolation", "Microbial isolation"],
                   ].map(([k, label]) => (
-                    <label key={k} style={{ display: "flex", gap: 10, alignItems: "center", padding: "8px 10px", borderRadius: 10, cursor: "pointer", transition: "all 0.2s ease", background: extraction[k] ? "rgba(37, 99, 235, 0.1)" : "white", color: extraction[k] ? "white" : "#1f2937", outline: "none" }}>
+                    <label key={k} style={{ display: "flex", gap: 10, alignItems: "center", padding: "8px 10px", borderRadius: 10, cursor: "pointer", transition: "all 0.2s ease", background: extraction[k] ? "rgba(37, 99, 235, 0.1)" : "white", color: "#000000" }}>
                       <img src={ICONS[k]} alt={label} style={{ width: 32, height: 32, objectFit: "contain", flexShrink: 0 }} />
                       <span style={{ flex: 1 }}>
                         <input
@@ -1125,7 +1111,7 @@ export default function App() {
               </div>
 
               <div style={{ ...cardStyle, background: COLORS.stage2.light }}>
-                <div style={{ fontWeight: 800, marginBottom: 12, color: "white" }}>Sequencing methods (per sample)</div>
+                <div style={{ fontWeight: 800, marginBottom: 12, color: "#000000" }}>Sequencing methods (per sample)</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   {[
                     ["amplicon", "Amplicon (16S/ITS) sequencing"],
@@ -1143,7 +1129,7 @@ export default function App() {
                             <img src={ICONS.lock} alt="locked" style={{ width: 18, height: 18, objectFit: "contain" }} />
                           </div>
                         )}
-                        <label style={{ display: "flex", gap: 10, alignItems: "center", padding: "8px 10px", borderRadius: 10, cursor: isDisabled ? "not-allowed" : "pointer", transition: "all 0.2s ease", background: sequencing[k] ? "rgba(37, 99, 235, 0.1)" : "white", opacity: isDisabled ? 0.5 : 1, color: sequencing[k] ? "white" : "#1f2937", outline: "none" }}>
+                        <label style={{ display: "flex", gap: 10, alignItems: "center", padding: "8px 10px", borderRadius: 10, cursor: isDisabled ? "not-allowed" : "pointer", transition: "all 0.2s ease", background: sequencing[k] ? "rgba(37, 99, 235, 0.1)" : "white", opacity: isDisabled ? 0.5 : 1, color: "#000000" }}>
                           <img src={ICONS[k]} alt={label} style={{ width: 32, height: 32, objectFit: "contain", flexShrink: 0 }} />
                           <span style={{ flex: 1 }}>
                             <input
@@ -1181,7 +1167,7 @@ export default function App() {
             </div>
 
             <div style={{ marginTop: 14, padding: 12, borderRadius: 12, background: COLORS.stage2.light, border: `1px solid ${COLORS.stage2.border}` }}>
-              <div style={{ fontWeight: 800, color: "white" }}>Stage 2 Total: {stage2Cost.toFixed(1)} credits ({totalSamples} samples)</div>
+              <div style={{ fontWeight: 800, color: "#000000" }}>Stage 2 Total: {stage2Cost.toFixed(1)} credits ({totalSamples} samples)</div>
             </div>
 
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 16, gap: 10, flexWrap: isMobile ? "wrap" : "nowrap" }}>
@@ -1201,10 +1187,10 @@ export default function App() {
         {stage === 3 && (
           <div style={cardStyle}>
             <h2 style={{ marginTop: 0, color: "#000000" }}>Data Analysis</h2>
-            <div style={{ color: "#1f2937", marginBottom: 10 }}>Costs are per sample. Total samples: <b>{totalSamples}</b></div>
+            <div style={{ color: "#000000", marginBottom: 10 }}>Costs are per sample. Total samples: <b>{totalSamples}</b></div>
 
             <div style={{ ...cardStyle, background: COLORS.stage3.light }}>
-              <div style={{ fontWeight: 800, marginBottom: 12, color: "white" }}>Analysis methods (per sample)</div>
+              <div style={{ fontWeight: 800, marginBottom: 12, color: "#000000" }}>Analysis methods (per sample)</div>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {[
                   ["taxonomy", "Taxonomic profiling"],
@@ -1223,7 +1209,7 @@ export default function App() {
                           <img src={ICONS.lock} alt="locked" style={{ width: 18, height: 18, objectFit: "contain" }} />
                         </div>
                       )}
-                      <label style={{ display: "flex", gap: 10, alignItems: "center", padding: "8px 10px", borderRadius: 10, cursor: isDisabled ? "not-allowed" : "pointer", transition: "all 0.2s ease", background: analysis[k] ? "rgba(124, 58, 237, 0.1)" : "white", opacity: isDisabled ? 0.5 : 1, color: analysis[k] ? "white" : "#1f2937", outline: "none" }}>
+                      <label style={{ display: "flex", gap: 10, alignItems: "center", padding: "8px 10px", borderRadius: 10, cursor: isDisabled ? "not-allowed" : "pointer", transition: "all 0.2s ease", background: analysis[k] ? "rgba(124, 58, 237, 0.1)" : "white", opacity: isDisabled ? 0.5 : 1, color: "#000000" }}>
                         <img src={ICONS[k]} alt={label} style={{ width: 32, height: 32, objectFit: "contain", flexShrink: 0 }} />
                         <span style={{ flex: 1 }}>
                           <input
@@ -1248,13 +1234,13 @@ export default function App() {
             </div>
 
             <div style={{ marginTop: 14, padding: 12, borderRadius: 12, background: COLORS.stage3.light, border: `1px solid ${COLORS.stage3.border}` }}>
-              <div style={{ fontWeight: 800, marginBottom: 8, color: "white" }}>HPC Computing Required</div>
-              <div style={{ fontSize: 14, color: "white", marginBottom: 8 }}>
+              <div style={{ fontWeight: 800, marginBottom: 8, color: "#000000" }}>HPC Computing Required</div>
+              <div style={{ fontSize: 14, color: "#000000", marginBottom: 8 }}>
                 {Object.values(analysis).some(v => v) 
                   ? `${hpcHours.toFixed(1)} hours (${(hpcHours * COSTS.hpcPerHour).toFixed(1)} credits)`
                   : "No analysis methods selected"}
               </div>
-              <div style={{ fontWeight: 800, paddingTop: 8, borderTop: `1px solid ${COLORS.stage3.border}`, color: "white" }}>Stage 3 Total: {stage3Cost.toFixed(1)} credits</div>
+              <div style={{ fontWeight: 800, paddingTop: 8, borderTop: `1px solid ${COLORS.stage3.border}` }}>Stage 3 Total: {stage3Cost.toFixed(1)} credits</div>
             </div>
 
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 16 }}>
@@ -1270,9 +1256,30 @@ export default function App() {
             </div>
           </div>
         )}
+
+        {/* Watermark signature */}
+        <div style={{ marginTop: 18, paddingBottom: 6, textAlign: "center" }}>
+          <a
+            href="https://www.gla.ac.uk/schools/infectionimmunity/staff/conorfeehily/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="watermark-link"
+            aria-label="By @SligoMicrobe (opens in a new tab)"
+            style={{
+              fontSize: 12,
+              color: "#6b7280",
+              textDecoration: "none",
+              opacity: 0.75,
+            }}
+          >
+            by @SligoMicrobe
+          </a>
+        </div>
+
         </div>
       </div>
       <Analytics />
     </>
   );
 }
+    
