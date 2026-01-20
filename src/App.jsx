@@ -6,21 +6,21 @@ const TOTAL_BUDGET = 5000;
 const COLORS = {
   stage1: {
     primary: "#16a34a",
-    light: "#ecfdf5",
-    border: "#bbf7d0",
-    text: "#15803d",
+    light: "#16a34a",
+    border: "#16a34a",
+    text: "#ffffff",
   },
   stage2: {
     primary: "#2563eb",
-    light: "#eff6ff",
-    border: "#bfdbfe",
-    text: "#1e40af",
+    light: "#2563eb",
+    border: "#2563eb",
+    text: "#ffffff",
   },
   stage3: {
     primary: "#7c3aed",
-    light: "#faf5ff",
-    border: "#e9d5ff",
-    text: "#6d28d9",
+    light: "#7c3aed",
+    border: "#7c3aed",
+    text: "#ffffff",
   },
 };
 
@@ -755,38 +755,6 @@ export default function App() {
             border-color: #374151 !important;
           }
 
-          /* AGGRESSIVE: Make all text light - use multiple selectors with filter */
-          * {
-            color: #f0f0f0 !important;
-          }
-
-          /* Override specific light colors to be even lighter for better contrast */
-          [style*="color: #111827"],
-          [style*="color: #1f2937"],
-          [style*="color: #374151"],
-          [style*="color: #4b5563"],
-          [style*="color: #6b7280"],
-          [style*="color: #475569"],
-          [style*="color: #64748b"],
-          [style*="color: #94a3b8"] {
-            color: #e5e7eb !important;
-          }
-
-          /* Even lighter for better contrast on dark backgrounds */
-          [style*="color: #15803d"],
-          [style*="color: #1e40af"],
-          [style*="color: #6d28d9"],
-          [style*="color: #059669"],
-          [style*="color: #d97706"],
-          [style*="color: #7c3aed"],
-          [style*="color: #1cb353"],
-          [style*="color: #2563eb"],
-          [style*="color: #ed3ade"],
-          [style*="color: #b45309"],
-          [style*="color: #b91c1c"] {
-            color: inherit !important;
-          }
-
           /* Borders lighter in dark mode */
           div[style*="border: 1px solid #e5e7eb"],
           div[style*="border: 2px solid #e5e7eb"],
@@ -814,66 +782,19 @@ export default function App() {
           }
 
           /* Light background sections - convert to dark */
-          div[style*="background: #ecfdf5"] {
-            background: #064e3b !important;
-          }
-
-          div[style*="background: #eff6ff"] {
-            background: #0c2d4c !important;
-          }
-
-          div[style*="background: #faf5ff"] {
-            background: #3b0764 !important;
-          }
-
-          div[style*="background: #f9fafb"] {
-            background: #1f2937 !important;
-          }
-
-          div[style*="background: #dbeafe"] {
-            background: #0c2d4c !important;
-          }
-
+          div[style*="background: #ecfdf5"],
+          div[style*="background: #eff6ff"],
+          div[style*="background: #faf5ff"],
+          div[style*="background: #f9fafb"],
+          div[style*="background: #dbeafe"],
           div[style*="background: #f3e8ff"] {
-            background: #3b0764 !important;
-          }
-
-          /* Make text inside colored boxes BLACK for contrast on dark backgrounds */
-          div[style*="background: #ecfdf5"] *,
-          div[style*="background: #eff6ff"] *,
-          div[style*="background: #faf5ff"] *,
-          div[style*="background: #dbeafe"] *,
-          div[style*="background: #f3e8ff"] * {
-            color: #000000 !important;
+            background: #1f2937 !important;
           }
 
           /* Error/warning colors stay visible */
           div[style*="background: #fef2f2"] {
             background: #7f1d1d !important;
             color: #fecaca !important;
-          }
-
-          /* Stage cost display colors - make brighter */
-          span[style*="color: #1cb353"] {
-            color: #86efac !important;
-          }
-
-          span[style*="color: #2563eb"] {
-            color: #93c5fd !important;
-          }
-
-          span[style*="color: #ed3ade"] {
-            color: #f472b6 !important;
-          }
-
-          /* Success text */
-          div[style*="color: #059669"] {
-            color: #86efac !important;
-          }
-
-          /* Warning text */
-          div[style*="color: #d97706"] {
-            color: #fbbf24 !important;
           }
 
           /* Tooltip background stays dark but ensure text is light */
@@ -930,7 +851,7 @@ export default function App() {
         <div style={{ maxWidth: 980, margin: "0 auto" }}>
         <div style={headerStyle} data-grid="header">
           <div>
-            <div style={{ fontSize: isMobile ? 18 : 22, fontWeight: 700 }}>Microbiome Project Budget Game</div>
+            <div style={{ fontSize: isMobile ? 18 : 22, fontWeight: 700, color: "#000000" }}>Microbiome Project Budget Game</div>
             <div style={{ color: "#4b5563", fontSize: isMobile ? 12 : 14 }}>Team: <strong>{teamName}</strong></div>
           </div>
           <button onClick={restartGame} style={{ padding: "8px 12px", borderRadius: 10, border: "1px solid #d1d5db", fontSize: isMobile ? 13 : 14 }}>
@@ -1017,10 +938,10 @@ export default function App() {
 
         {stage === 1 && (
           <div style={cardStyle}>
-            <h2 style={{ marginTop: 0, color: COLORS.stage1.text }}>Recruitment & Sampling</h2>
+            <h2 style={{ marginTop: 0, color: "#000000" }}>Recruitment & Sampling</h2>
 
             <div style={{ ...cardStyle, background: COLORS.stage1.light, marginBottom: 14 }}>
-              <div style={{ fontWeight: 800, marginBottom: 12 }}>Study Subject <InfoTip text="Choose between mouse models (cheaper) or human subjects (more expensive, more relevant for human disease)" /></div>
+              <div style={{ fontWeight: 800, marginBottom: 12, color: "#000000" }}>Study Subject <InfoTip text="Choose between mouse models (cheaper) or human subjects (more expensive, more relevant for human disease)" /></div>
               <div style={{ display: "flex", gap: 16 }}>
                 {[
                   ["mice", "Mouse models", "2 credits/subject"],
@@ -1043,7 +964,7 @@ export default function App() {
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               <label>
-                <div style={{ fontWeight: 600 }}>Number of {participantType === "mice" ? "mice" : "participants"} <InfoTip text={TOOLTIPS.participants} /></div>
+                <div style={{ fontWeight: 600, color: "#000000" }}>Number of {participantType === "mice" ? "mice" : "participants"} <InfoTip text={TOOLTIPS.participants} /></div>
                 <input
                   type="number"
                   value={participants}
@@ -1057,7 +978,7 @@ export default function App() {
               </label>
 
               <label>
-                <div style={{ fontWeight: 600 }}>Time points <InfoTip text={TOOLTIPS.timepoints} /></div>
+                <div style={{ fontWeight: 600, color: "#000000" }}>Time points <InfoTip text={TOOLTIPS.timepoints} /></div>
                 <input
                   type="number"
                   value={timepoints}
@@ -1069,7 +990,7 @@ export default function App() {
               </label>
             </div>
 
-            <div style={{ marginTop: 14, fontWeight: 700, fontSize: isMobile ? 14 : 16 }}>Sample types <InfoTip text={TOOLTIPS.sampleTypes} /></div>
+            <div style={{ marginTop: 14, fontWeight: 700, fontSize: isMobile ? 14 : 16, color: "#000000" }}>Sample types <InfoTip text={TOOLTIPS.sampleTypes} /></div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: isMobile ? 8 : 10, marginTop: 10 }} data-grid="sample-types">
               {[
                 ["stool", "Stool sample"],
@@ -1097,7 +1018,7 @@ export default function App() {
                     }}
                   >
                     <img src={ICONS[key]} alt={label} style={{ width: isMobile ? 40 : 48, height: isMobile ? 40 : 48, objectFit: "contain" }} />
-                    <span style={{ fontSize: isMobile ? 12 : 13, fontWeight: 500, textAlign: "center" }}>{label}</span>
+                    <span style={{ fontSize: isMobile ? 12 : 13, fontWeight: 500, textAlign: "center", color: "#000000" }}>{label}</span>
                     <span style={{ fontSize: isMobile ? 10 : 11, color: "#4b5563" }}>{cost} credits/sample</span>
                     <input
                       type="checkbox"
@@ -1123,11 +1044,11 @@ export default function App() {
             </label>
 
             <div style={{ marginTop: 16, padding: 12, borderRadius: 12, background: COLORS.stage1.light, border: `1px solid ${COLORS.stage1.border}` }}>
-              <div style={{ fontWeight: 700 }}>
+              <div style={{ fontWeight: 700, color: "#000000" }}>
                 Calculation: {clampInt(participants)} participants × {clampInt(timepoints, 1)} timepoints × {selectedSampleTypeCount} sample types ={" "}
                 <span>{totalSamples}</span> total samples
               </div>
-              <div style={{ marginTop: 6, fontWeight: 700 }}>Stage 1 Total: {stage1Cost.toFixed(1)} credits</div>
+              <div style={{ marginTop: 6, fontWeight: 700, color: "#000000" }}>Stage 1 Total: {stage1Cost.toFixed(1)} credits</div>
             </div>
 
             <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}>
@@ -1143,12 +1064,12 @@ export default function App() {
 
         {stage === 2 && (
           <div style={cardStyle}>
-            <h2 style={{ marginTop: 0, color: COLORS.stage2.text }}>Data Collection</h2>
-            <div style={{ color: "#6b7280", marginBottom: 10 }}>Costs are per sample. Total samples: <b>{totalSamples}</b></div>
+            <h2 style={{ marginTop: 0, color: "#000000" }}>Data Collection</h2>
+            <div style={{ color: "#000000", marginBottom: 10 }}>Costs are per sample. Total samples: <b>{totalSamples}</b></div>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }} data-grid="stage2-layout">
-              <div style={{ ...cardStyle, background: "#f9fafb" }}>
-                <div style={{ fontWeight: 800, marginBottom: 12 }}>Extraction methods (per sample) <InfoTip text={TOOLTIPS.extraction} /></div>
+              <div style={{ ...cardStyle, background: COLORS.stage2.light }}>
+                <div style={{ fontWeight: 800, marginBottom: 12, color: "#000000" }}>Extraction methods (per sample) <InfoTip text={TOOLTIPS.extraction} /></div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   {[
                     ["dna", "DNA extraction"],
@@ -1156,7 +1077,7 @@ export default function App() {
                     ["metabolite", "Metabolite extraction"],
                     ["isolation", "Microbial isolation"],
                   ].map(([k, label]) => (
-                    <label key={k} style={{ display: "flex", gap: 10, alignItems: "center", padding: "8px 10px", borderRadius: 10, cursor: "pointer", transition: "all 0.2s ease", background: extraction[k] ? "rgba(37, 99, 235, 0.1)" : "white" }}>
+                    <label key={k} style={{ display: "flex", gap: 10, alignItems: "center", padding: "8px 10px", borderRadius: 10, cursor: "pointer", transition: "all 0.2s ease", background: extraction[k] ? "rgba(37, 99, 235, 0.1)" : "white", color: "#000000" }}>
                       <img src={ICONS[k]} alt={label} style={{ width: 32, height: 32, objectFit: "contain", flexShrink: 0 }} />
                       <span style={{ flex: 1 }}>
                         <input
@@ -1173,8 +1094,8 @@ export default function App() {
                 </div>
               </div>
 
-              <div style={{ ...cardStyle, background: "#f9fafb" }}>
-                <div style={{ fontWeight: 800, marginBottom: 12 }}>Sequencing methods (per sample)</div>
+              <div style={{ ...cardStyle, background: COLORS.stage2.light }}>
+                <div style={{ fontWeight: 800, marginBottom: 12, color: "#000000" }}>Sequencing methods (per sample)</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   {[
                     ["amplicon", "Amplicon (16S/ITS) sequencing"],
@@ -1192,7 +1113,7 @@ export default function App() {
                             <img src={ICONS.lock} alt="locked" style={{ width: 18, height: 18, objectFit: "contain" }} />
                           </div>
                         )}
-                        <label style={{ display: "flex", gap: 10, alignItems: "center", padding: "8px 10px", borderRadius: 10, cursor: isDisabled ? "not-allowed" : "pointer", transition: "all 0.2s ease", background: sequencing[k] ? "rgba(37, 99, 235, 0.1)" : "white", opacity: isDisabled ? 0.5 : 1 }}>
+                        <label style={{ display: "flex", gap: 10, alignItems: "center", padding: "8px 10px", borderRadius: 10, cursor: isDisabled ? "not-allowed" : "pointer", transition: "all 0.2s ease", background: sequencing[k] ? "rgba(37, 99, 235, 0.1)" : "white", opacity: isDisabled ? 0.5 : 1, color: "#000000" }}>
                           <img src={ICONS[k]} alt={label} style={{ width: 32, height: 32, objectFit: "contain", flexShrink: 0 }} />
                           <span style={{ flex: 1 }}>
                             <input
@@ -1215,7 +1136,7 @@ export default function App() {
             </div>
 
             <div style={{ marginTop: 14, padding: 12, borderRadius: 12, background: COLORS.stage2.light, border: `1px solid ${COLORS.stage2.border}` }}>
-              <div style={{ fontWeight: 800 }}>Stage 2 Total: {stage2Cost.toFixed(1)} credits ({totalSamples} samples)</div>
+              <div style={{ fontWeight: 800, color: "#000000" }}>Stage 2 Total: {stage2Cost.toFixed(1)} credits ({totalSamples} samples)</div>
             </div>
 
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 16, gap: 10, flexWrap: isMobile ? "wrap" : "nowrap" }}>
@@ -1234,11 +1155,11 @@ export default function App() {
 
         {stage === 3 && (
           <div style={cardStyle}>
-            <h2 style={{ marginTop: 0, color: COLORS.stage3.text }}>Data Analysis</h2>
-            <div style={{ color: "#6b7280", marginBottom: 10 }}>Costs are per sample. Total samples: <b>{totalSamples}</b></div>
+            <h2 style={{ marginTop: 0, color: "#000000" }}>Data Analysis</h2>
+            <div style={{ color: "#000000", marginBottom: 10 }}>Costs are per sample. Total samples: <b>{totalSamples}</b></div>
 
             <div style={{ ...cardStyle, background: COLORS.stage3.light }}>
-              <div style={{ fontWeight: 800, marginBottom: 12 }}>Analysis methods (per sample)</div>
+              <div style={{ fontWeight: 800, marginBottom: 12, color: "#000000" }}>Analysis methods (per sample)</div>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {[
                   ["taxonomy", "Taxonomic profiling"],
@@ -1257,7 +1178,7 @@ export default function App() {
                           <img src={ICONS.lock} alt="locked" style={{ width: 18, height: 18, objectFit: "contain" }} />
                         </div>
                       )}
-                      <label style={{ display: "flex", gap: 10, alignItems: "center", padding: "8px 10px", borderRadius: 10, cursor: isDisabled ? "not-allowed" : "pointer", transition: "all 0.2s ease", background: analysis[k] ? "rgba(124, 58, 237, 0.1)" : "white", opacity: isDisabled ? 0.5 : 1 }}>
+                      <label style={{ display: "flex", gap: 10, alignItems: "center", padding: "8px 10px", borderRadius: 10, cursor: isDisabled ? "not-allowed" : "pointer", transition: "all 0.2s ease", background: analysis[k] ? "rgba(124, 58, 237, 0.1)" : "white", opacity: isDisabled ? 0.5 : 1, color: "#000000" }}>
                         <img src={ICONS[k]} alt={label} style={{ width: 32, height: 32, objectFit: "contain", flexShrink: 0 }} />
                         <span style={{ flex: 1 }}>
                           <input
@@ -1282,8 +1203,8 @@ export default function App() {
             </div>
 
             <div style={{ marginTop: 14, padding: 12, borderRadius: 12, background: COLORS.stage3.light, border: `1px solid ${COLORS.stage3.border}` }}>
-              <div style={{ fontWeight: 800, marginBottom: 8 }}>HPC Computing Required</div>
-              <div style={{ fontSize: 14, color: COLORS.stage3.text, marginBottom: 8 }}>
+              <div style={{ fontWeight: 800, marginBottom: 8, color: "#000000" }}>HPC Computing Required</div>
+              <div style={{ fontSize: 14, color: "#000000", marginBottom: 8 }}>
                 {Object.values(analysis).some(v => v) 
                   ? `${hpcHours.toFixed(1)} hours (${(hpcHours * COSTS.hpcPerHour).toFixed(1)} credits)`
                   : "No analysis methods selected"}
