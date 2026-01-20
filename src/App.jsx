@@ -755,34 +755,36 @@ export default function App() {
             border-color: #374151 !important;
           }
 
-          /* Text colors - make all dark text light */
-          h1, h2, h3, h4, h5, h6,
-          label, span, p, div {
+          /* AGGRESSIVE: Make all text light - use multiple selectors with filter */
+          * {
             color: #f0f0f0 !important;
           }
 
-          /* Specific dark text colors to light */
-          div[style*="color: #111827"],
-          div[style*="color: #1f2937"],
-          div[style*="color: #374151"],
-          div[style*="color: #4b5563"],
-          div[style*="color: #6b7280"],
-          span[style*="color: #111827"],
-          span[style*="color: #1f2937"],
-          span[style*="color: #374151"],
-          span[style*="color: #4b5563"],
-          span[style*="color: #6b7280"],
-          p[style*="color: #111827"],
-          p[style*="color: #1f2937"],
-          p[style*="color: #374151"],
-          p[style*="color: #4b5563"],
-          p[style*="color: #6b7280"],
-          label[style*="color: #111827"],
-          label[style*="color: #1f2937"],
-          label[style*="color: #374151"],
-          label[style*="color: #4b5563"],
-          label[style*="color: #6b7280"] {
-            color: #d1d5db !important;
+          /* Override specific light colors to be even lighter for better contrast */
+          [style*="color: #111827"],
+          [style*="color: #1f2937"],
+          [style*="color: #374151"],
+          [style*="color: #4b5563"],
+          [style*="color: #6b7280"],
+          [style*="color: #475569"],
+          [style*="color: #64748b"],
+          [style*="color: #94a3b8"] {
+            color: #e5e7eb !important;
+          }
+
+          /* Even lighter for better contrast on dark backgrounds */
+          [style*="color: #15803d"],
+          [style*="color: #1e40af"],
+          [style*="color: #6d28d9"],
+          [style*="color: #059669"],
+          [style*="color: #d97706"],
+          [style*="color: #7c3aed"],
+          [style*="color: #1cb353"],
+          [style*="color: #2563eb"],
+          [style*="color: #ed3ade"],
+          [style*="color: #b45309"],
+          [style*="color: #b91c1c"] {
+            color: inherit !important;
           }
 
           /* Borders lighter in dark mode */
@@ -919,6 +921,12 @@ export default function App() {
           div[style*="background: #faf5ff"] label,
           div[style*="background: #faf5ff"] span {
             color: #f0f0f0 !important;
+          }
+
+          /* Lock icon background in dark mode */
+          div[style*="background: white"][style*="border: 1px solid #d1d5db"] {
+            background: #2d3748 !important;
+            border-color: #4b5563 !important;
           }
         }
       `}</style>
@@ -1184,7 +1192,9 @@ export default function App() {
                     return (
                       <div key={k} style={{ position: "relative" }}>
                         {isDisabled && (
-                          <img src={ICONS.lock} alt="locked" style={{ position: "absolute", top: 2, right: 2, width: 24, height: 24, zIndex: 10 }} />
+                          <div style={{ position: "absolute", top: 2, right: 2, width: 28, height: 28, background: "white", borderRadius: 4, display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid #d1d5db", zIndex: 10 }}>
+                            <img src={ICONS.lock} alt="locked" style={{ width: 18, height: 18, objectFit: "contain" }} />
+                          </div>
                         )}
                         <label style={{ display: "flex", gap: 10, alignItems: "center", padding: "8px 10px", borderRadius: 10, cursor: isDisabled ? "not-allowed" : "pointer", transition: "all 0.2s ease", background: sequencing[k] ? "rgba(37, 99, 235, 0.1)" : "white", opacity: isDisabled ? 0.5 : 1 }}>
                           <img src={ICONS[k]} alt={label} style={{ width: 32, height: 32, objectFit: "contain", flexShrink: 0 }} />
@@ -1247,7 +1257,9 @@ export default function App() {
                   return (
                     <div key={k} style={{ position: "relative" }}>
                       {isDisabled && (
-                        <img src={ICONS.lock} alt="locked" style={{ position: "absolute", top: 2, right: 2, width: 24, height: 24, zIndex: 10 }} />
+                        <div style={{ position: "absolute", top: 2, right: 2, width: 28, height: 28, background: "white", borderRadius: 4, display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid #d1d5db", zIndex: 10 }}>
+                          <img src={ICONS.lock} alt="locked" style={{ width: 18, height: 18, objectFit: "contain" }} />
+                        </div>
                       )}
                       <label style={{ display: "flex", gap: 10, alignItems: "center", padding: "8px 10px", borderRadius: 10, cursor: isDisabled ? "not-allowed" : "pointer", transition: "all 0.2s ease", background: analysis[k] ? "rgba(124, 58, 237, 0.1)" : "white", opacity: isDisabled ? 0.5 : 1 }}>
                         <img src={ICONS[k]} alt={label} style={{ width: 32, height: 32, objectFit: "contain", flexShrink: 0 }} />
