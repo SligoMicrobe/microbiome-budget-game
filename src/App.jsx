@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Analytics } from "@vercel/analytics/react";
 
 const TOTAL_BUDGET = 5000;
 
@@ -433,8 +434,9 @@ export default function App() {
   };
 
   return (
-    <div style={pageStyle}>
-      <div style={{ maxWidth: 980, margin: "0 auto" }}>
+    <>
+      <div style={pageStyle}>
+        <div style={{ maxWidth: 980, margin: "0 auto" }}>
         <div style={headerStyle}>
           <div>
             <div style={{ fontSize: 22, fontWeight: 700 }}>Microbiome Project Budget Game</div>
@@ -771,6 +773,7 @@ export default function App() {
           </div>
         )}
       </div>
-    </div>
+      <Analytics />
+    </>
   );
 }
