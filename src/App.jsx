@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { Analytics } from "@vercel/analytics/react";
 
-const TOTAL_BUDGET = 5000;
+const TOTAL_BUDGET = 50000;
 
 const COLORS = {
   stage1: {
@@ -96,39 +96,39 @@ const TOOLTIPS = {
 };
 
 const COSTS = {
-  // Stage 1
+  // Stage 1 (GBP)
   participant: {
-    mice: 2,
-    humans: 5,
+    mice: 20,           // £20 per mouse
+    humans: 50,         // £50 per participant
   },
   sampleTypePerSample: {
-    default: 1,
-    tissue: 3,
+    default: 5,         // £5 for standard samples (stool, swabs)
+    tissue: 200,        // £200 for tissue biopsy
   },
-  incentivePerParticipant: 2,
+  incentivePerParticipant: 20,  // £20 participant incentive
 
-  // Stage 2 (per sample)
+  // Stage 2 (per sample, GBP)
   extraction: {
-    dna: 2,
-    rna: 2,
-    metabolite: 2,
-    isolation: 2,
+    dna: 15,            // £15
+    rna: 20,            // £20
+    metabolite: 30,     // £30
+    isolation: 50,      // £50
   },
   sequencing: {
-    amplicon: 2,
-    shotgun: 5,
-    rnaseq: 5,
-    metabolomics: 5,
+    amplicon: 40,       // £40 (16S/ITS)
+    shotgun: 200,       // £200 (metagenomic)
+    rnaseq: 220,        // £220 (more delicate than DNA, higher depth needed)
+    metabolomics: 300,  // £300 (LC-MS)
   },
 
-  // Stage 3
+  // Stage 3 (GBP)
   analysisPerSample: {
-    taxonomy: 0.5,
-    functional: 1,
-    mag: 1,
-    ml: 2,
+    taxonomy: 10,       // £10
+    functional: 20,     // £20
+    mag: 50,            // £50
+    ml: 30,             // £30
   },
-  hpcPerHour: 0.1,
+  hpcPerHour: 0.02,   // £0.02 per core-hour
   hpcHoursPerSample: {
     taxonomy: 0.5,
     functional: 1.5,
@@ -253,6 +253,8 @@ export default function App() {
   const [teamName, setTeamName] = useState("");
   const [gameStarted, setGameStarted] = useState(false);
   const [teamNameInput, setTeamNameInput] = useState("");
+  const [studyAim, setStudyAim] = useState("");
+  const [studyAimInput, setStudyAimInput] = useState("");
   const [studyComplete, setStudyComplete] = useState(false);
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024);
 
@@ -363,7 +365,8 @@ export default function App() {
 
   function startGame() {
     if (teamNameInput.trim()) {
-      setTeamName(teamNameInput);
+      setTeamName(teamNameInput.trim());
+      setStudyAim(studyAimInput.trim());
       setGameStarted(true);
     }
   }
@@ -384,6 +387,8 @@ export default function App() {
     setGameStarted(false);
     setTeamName("");
     setTeamNameInput("");
+    setStudyAim("");
+    setStudyAimInput("");
     setStudyComplete(false);
     resetAll();
   }
@@ -443,6 +448,28 @@ export default function App() {
                   boxSizing: "border-box",
                 }}
                 autoFocus
+              />
+            </div>
+
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ display: "block", marginBottom: 8, fontWeight: 600, color: "#374151", textAlign: "left", fontSize: isMobile ? 13 : 14 }}>
+                Study Aim <span style={{ fontWeight: 400, color: "#6b7280" }}>(Optional)</span>
+              </label>
+              <textarea
+                value={studyAimInput}
+                onChange={(e) => setStudyAimInput(e.target.value)}
+                placeholder="Describe the aim of your study..."
+                rows={4}
+                style={{
+                  width: "100%",
+                  padding: "12px 14px",
+                  borderRadius: 10,
+                  border: "2px solid #d1d5db",
+                  fontSize: isMobile ? 14 : 16,
+                  boxSizing: "border-box",
+                  fontFamily: "inherit",
+                  resize: "vertical",
+                }}
               />
             </div>
 
@@ -520,6 +547,12 @@ export default function App() {
           }}>
             <h1 style={{ marginTop: 0, color: COLORS.stage1.text, fontSize: isMobile ? 20 : 26 }}>Study Design Summary</h1>
             <p style={{ color: "#4b5563", marginBottom: 20, fontSize: isMobile ? 13 : 14 }}>Team: <strong>{teamName}</strong></p>
+            {studyAim && (
+              <div style={{ background: "#f9fafb", padding: 12, borderRadius: 8, marginBottom: 20, border: "1px solid #e5e7eb" }}>
+                <div style={{ color: "#6b7280", fontSize: 12, marginBottom: 4, fontWeight: 600 }}>Study Aim</div>
+                <div style={{ color: "#1f2937", fontSize: isMobile ? 13 : 14 }}>{studyAim}</div>
+              </div>
+            )}
 
             <div style={{ borderTop: "1px solid #e5e7eb", paddingTop: 16 }}>
               <h3 style={{ color: COLORS.stage1.text, marginTop: 0, fontSize: isMobile ? 16 : 18 }}>Research Design</h3>
@@ -631,19 +664,19 @@ export default function App() {
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, fontSize: isMobile ? 13 : 14, marginBottom: 12 }} data-grid="summary-grid">
                 <div>
                   <div style={{ color: "#4b5563", fontSize: 12 }}>Stage 1: Recruitment & Sampling</div>
-                  <div style={{ fontWeight: 700, fontSize: 16 }}>{stage1Cost.toFixed(1)} credits</div>
+                  <div style={{ fontWeight: 700, fontSize: 16 }}>£{stage1Cost.toFixed(0)}</div>
                 </div>
                 <div>
                   <div style={{ color: "#4b5563", fontSize: 12 }}>Stage 2: Data Collection</div>
-                  <div style={{ fontWeight: 700, fontSize: 16 }}>{stage2Cost.toFixed(1)} credits</div>
+                  <div style={{ fontWeight: 700, fontSize: 16 }}>£{stage2Cost.toFixed(0)}</div>
                 </div>
                 <div>
                   <div style={{ color: "#4b5563", fontSize: 12 }}>Stage 3: Data Analysis</div>
-                  <div style={{ fontWeight: 700, fontSize: 16 }}>{stage3Cost.toFixed(1)} credits</div>
+                  <div style={{ fontWeight: 700, fontSize: 16 }}>£{stage3Cost.toFixed(0)}</div>
                 </div>
                 <div>
                   <div style={{ color: "#4b5563", fontSize: 12 }}>Total Budget</div>
-                  <div style={{ fontWeight: 700, fontSize: 16 }}>{TOTAL_BUDGET} credits</div>
+                  <div style={{ fontWeight: 700, fontSize: 16 }}>£{TOTAL_BUDGET.toLocaleString()}</div>
                 </div>
               </div>
               <div style={{ borderTop: "2px solid " + (overBudget ? "#fca5a5" : COLORS.stage1.border), paddingTop: 12, marginTop: 12 }}>
@@ -652,13 +685,19 @@ export default function App() {
                 </div>
                 <div style={{ fontSize: 16, fontWeight: 700, marginTop: 6, color: overBudget ? "#b91c1c" : COLORS.stage1.text }}>
                   {overBudget
-                    ? `Over by ${Math.abs(remaining).toFixed(1)} credits`
-                    : `${remaining.toFixed(1)} credits remaining`}
+                    ? `Over by £${Math.abs(remaining).toFixed(0)}`
+                    : `£${remaining.toFixed(0)} remaining`}
                 </div>
               </div>
             </div>
 
             <div style={{ display: "flex", gap: 12, marginTop: 20, justifyContent: "space-between", flexDirection: isMobile ? "column" : "row" }}>
+              <button
+                onClick={() => window.print()}
+                style={{ flex: 1, padding: "12px 16px", borderRadius: 12, border: "1px solid #2563eb", background: "#2563eb", color: "white", fontWeight: 600, cursor: "pointer" }}
+              >
+                📄 Download PDF
+              </button>
               <button
                 onClick={() => setStudyComplete(false)}
                 style={{ flex: 1, padding: "12px 16px", borderRadius: 12, border: "1px solid #d1d5db", background: "white", fontWeight: 600, cursor: "pointer" }}
@@ -688,6 +727,21 @@ export default function App() {
   return (
     <>
       <style>{`
+        @media print {
+          button {
+            display: none !important;
+          }
+          .watermark-link {
+            display: none !important;
+          }
+          body {
+            background: white !important;
+          }
+          * {
+            box-shadow: none !important;
+          }
+        }
+
         @media (max-width: 639px) {
           div[data-grid="sample-types"] {
             grid-template-columns: repeat(1, 1fr) !important;
@@ -849,6 +903,20 @@ export default function App() {
       `}</style>
       <div style={pageStyle}>
         <div style={{ maxWidth: 980, margin: "0 auto" }}>
+        
+        {/* Banner image */}
+        <div style={{ marginBottom: 16, borderRadius: 12, overflow: "hidden" }}>
+          <img 
+            src="/icons/banner.png" 
+            alt="Microbiome Budget Game Banner" 
+            style={{ 
+              width: "100%", 
+              height: "auto", 
+              display: "block" 
+            }} 
+          />
+        </div>
+
         <div style={headerStyle} data-grid="header">
           <div>
             <div style={{ fontSize: isMobile ? 18 : 22, fontWeight: 700, color: "#000000" }}>Microbiome Project Budget Game</div>
@@ -868,14 +936,14 @@ export default function App() {
               </div>
               {overBudget && (
                 <div style={{ marginTop: 6, color: "#b91c1c", fontWeight: 600 }}>
-                  Over budget! You&apos;ve exceeded your {TOTAL_BUDGET} credits by {Math.abs(remaining).toFixed(1)} credits.
+                  Over budget! You&apos;ve exceeded your £{TOTAL_BUDGET.toLocaleString()} budget by £{Math.abs(remaining).toFixed(0)}.
                 </div>
               )}
             </div>
             <div style={{ display: "flex", gap: isMobile ? 8 : 14, alignItems: "center", flexWrap: "wrap" }}>
-              <span style={{ color: "#1cb353", fontWeight: 600, fontSize: isMobile ? 12 : 14 }}>Stage 1: {stage1Cost.toFixed(1)}</span>
-              <span style={{ color: "#2563eb", fontWeight: 600, fontSize: isMobile ? 12 : 14 }}>Stage 2: {stage2Cost.toFixed(1)}</span>
-              <span style={{ color: "#ed3ade", fontWeight: 600, fontSize: isMobile ? 12 : 14 }}>Stage 3: {stage3Cost.toFixed(1)}</span>
+              <span style={{ color: "#1cb353", fontWeight: 600, fontSize: isMobile ? 12 : 14 }}>Stage 1: £{stage1Cost.toFixed(0)}</span>
+              <span style={{ color: "#2563eb", fontWeight: 600, fontSize: isMobile ? 12 : 14 }}>Stage 2: £{stage2Cost.toFixed(0)}</span>
+              <span style={{ color: "#ed3ade", fontWeight: 600, fontSize: isMobile ? 12 : 14 }}>Stage 3: £{stage3Cost.toFixed(0)}</span>
             </div>
           </div>
 
@@ -944,8 +1012,8 @@ export default function App() {
               <div style={{ fontWeight: 800, marginBottom: 12, color: "#000000" }}>Study Subject <InfoTip text="Choose between mouse models (cheaper) or human subjects (more expensive, more relevant for human disease)" /></div>
               <div style={{ display: "flex", gap: 16 }}>
                 {[
-                  ["mice", "Mouse models", "2 credits/subject"],
-                  ["humans", "Human subjects", "5 credits/subject"],
+                  ["mice", "Mouse models", "£20/subject"],
+                  ["humans", "Human subjects", "£50/subject"],
                 ].map(([type, label, cost]) => (
                   <label key={type} style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
                     <input
@@ -973,7 +1041,7 @@ export default function App() {
                   style={{ width: "100%", padding: 10, borderRadius: 10, border: `2px solid ${COLORS.stage1.primary}` }}
                 />
                 <div style={{ color: "#4b5563", fontSize: 12 }}>
-                  × {COSTS.participant[participantType]} credits = {(clampInt(participants) * COSTS.participant[participantType]).toFixed(1)}
+                  × £{COSTS.participant[participantType]} = £{(clampInt(participants) * COSTS.participant[participantType]).toFixed(0)}
                 </div>
               </label>
 
@@ -1019,7 +1087,7 @@ export default function App() {
                   >
                     <img src={ICONS[key]} alt={label} style={{ width: isMobile ? 40 : 48, height: isMobile ? 40 : 48, objectFit: "contain" }} />
                     <span style={{ fontSize: isMobile ? 12 : 13, fontWeight: 500, textAlign: "center", color: "#000000" }}>{label}</span>
-                    <span style={{ fontSize: isMobile ? 10 : 11, color: "#4b5563" }}>{cost} credits/sample</span>
+                    <span style={{ fontSize: isMobile ? 10 : 11, color: "#4b5563" }}>£{cost}/sample</span>
                     <input
                       type="checkbox"
                       checked={sampleTypes[key]}
@@ -1040,7 +1108,7 @@ export default function App() {
             <label style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 16 }}>
               <input type="checkbox" checked={incentives} onChange={(e) => setIncentives(e.target.checked)} />
               <span style={{ fontWeight: 700 }}>Include participant incentives <InfoTip text={TOOLTIPS.incentives} /></span>
-              <span style={{ color: "#4b5563" }}>({COSTS.incentivePerParticipant} credits/participant)</span>
+              <span style={{ color: "#4b5563" }}>(£{COSTS.incentivePerParticipant}/participant)</span>
             </label>
 
             <div style={{ marginTop: 16, padding: 12, borderRadius: 12, background: COLORS.stage1.light, border: `1px solid ${COLORS.stage1.border}` }}>
@@ -1048,7 +1116,7 @@ export default function App() {
                 Calculation: {clampInt(participants)} participants × {clampInt(timepoints, 1)} timepoints × {selectedSampleTypeCount} sample types ={" "}
                 <span>{totalSamples}</span> total samples
               </div>
-              <div style={{ marginTop: 6, fontWeight: 700, color: "#000000" }}>Stage 1 Total: {stage1Cost.toFixed(1)} credits</div>
+              <div style={{ marginTop: 6, fontWeight: 700, color: "#000000" }}>Stage 1 Total: £{stage1Cost.toFixed(0)}</div>
             </div>
 
             <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}>
@@ -1104,7 +1172,7 @@ export default function App() {
                         />
                         {label} <InfoTip text={TOOLTIPS[k]} />
                       </span>
-                      <span style={{ color: "#4b5563", whiteSpace: "nowrap" }}>{COSTS.extraction[k]}</span>
+                      <span style={{ color: "#4b5563", whiteSpace: "nowrap" }}>£{COSTS.extraction[k]}</span>
                     </label>
                   ))}
                 </div>
@@ -1157,7 +1225,7 @@ export default function App() {
                             {label} <InfoTip text={TOOLTIPS[k]} />
                             {isDisabled && <div style={{ color: "#d97706", fontSize: 11, marginTop: 4 }}>⚠️ {restrictionMsg}</div>}
                           </span>
-                          <span style={{ color: "#4b5563", whiteSpace: "nowrap" }}>{COSTS.sequencing[k]}</span>
+                          <span style={{ color: "#4b5563", whiteSpace: "nowrap" }}>£{COSTS.sequencing[k]}</span>
                         </label>
                       </div>
                     );
@@ -1167,7 +1235,7 @@ export default function App() {
             </div>
 
             <div style={{ marginTop: 14, padding: 12, borderRadius: 12, background: COLORS.stage2.light, border: `1px solid ${COLORS.stage2.border}` }}>
-              <div style={{ fontWeight: 800, color: "#000000" }}>Stage 2 Total: {stage2Cost.toFixed(1)} credits ({totalSamples} samples)</div>
+              <div style={{ fontWeight: 800, color: "#000000" }}>Stage 2 Total: £{stage2Cost.toFixed(0)} ({totalSamples} samples)</div>
             </div>
 
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 16, gap: 10, flexWrap: isMobile ? "wrap" : "nowrap" }}>
@@ -1223,7 +1291,7 @@ export default function App() {
                           {isDisabled && <div style={{ color: "#d97706", fontSize: 11, marginTop: 4 }}>⚠️ {restrictionMsg}</div>}
                         </span>
                         <span style={{ color: "#6b7280", whiteSpace: "nowrap" }}>
-                          <div style={{ fontSize: 12 }}>{COSTS.analysisPerSample[k]}</div>
+                          <div style={{ fontSize: 12 }}>£{COSTS.analysisPerSample[k]}</div>
                           <div style={{ fontSize: 11, color: "#7c3aed", fontWeight: 600 }}>{hpcPerSample} hrs/sample</div>
                         </span>
                       </label>
@@ -1237,10 +1305,10 @@ export default function App() {
               <div style={{ fontWeight: 800, marginBottom: 8, color: "#000000" }}>HPC Computing Required</div>
               <div style={{ fontSize: 14, color: "#000000", marginBottom: 8 }}>
                 {Object.values(analysis).some(v => v) 
-                  ? `${hpcHours.toFixed(1)} hours (${(hpcHours * COSTS.hpcPerHour).toFixed(1)} credits)`
+                  ? `${hpcHours.toFixed(1)} hours (£${(hpcHours * COSTS.hpcPerHour).toFixed(2)})`
                   : "No analysis methods selected"}
               </div>
-              <div style={{ fontWeight: 800, paddingTop: 8, borderTop: `1px solid ${COLORS.stage3.border}` }}>Stage 3 Total: {stage3Cost.toFixed(1)} credits</div>
+              <div style={{ fontWeight: 800, paddingTop: 8, borderTop: `1px solid ${COLORS.stage3.border}` }}>Stage 3 Total: £{stage3Cost.toFixed(0)}</div>
             </div>
 
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 16 }}>
