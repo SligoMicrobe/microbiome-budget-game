@@ -732,57 +732,75 @@ export default function App() {
 
         /* Dark mode support */
         @media (prefers-color-scheme: dark) {
+          * {
+            color-scheme: dark;
+          }
+
           body, div[style*="background: #f6f7fb"] {
             background: #111827 !important;
           }
+
+          /* Main page background */
+          div[style*="pageStyle"] {
+            background: #111827 !important;
+          }
           
-          div[style*="background: white"] {
+          /* All cards and white backgrounds */
+          div[style*="background: white"],
+          div[style*="background:white"] {
             background: #1f2937 !important;
             border-color: #374151 !important;
           }
 
-          /* Text colors in dark mode */
-          h1, h2, h3 {
+          /* Text colors - make all dark text light */
+          h1, h2, h3, h4, h5, h6,
+          label, span, p, div {
             color: #f0f0f0 !important;
           }
 
-          /* Light gray text to light in dark mode */
-          div[style*="color: #6b7280"],
-          div[style*="color: #4b5563"],
-          div[style*="color: #374151"],
+          /* Specific dark text colors to light */
+          div[style*="color: #111827"],
           div[style*="color: #1f2937"],
-          span[style*="color: #6b7280"],
-          span[style*="color: #4b5563"],
-          span[style*="color: #374151"],
+          div[style*="color: #374151"],
+          div[style*="color: #4b5563"],
+          div[style*="color: #6b7280"],
+          span[style*="color: #111827"],
           span[style*="color: #1f2937"],
-          p[style*="color: #6b7280"],
-          p[style*="color: #4b5563"],
+          span[style*="color: #374151"],
+          span[style*="color: #4b5563"],
+          span[style*="color: #6b7280"],
+          p[style*="color: #111827"],
+          p[style*="color: #1f2937"],
           p[style*="color: #374151"],
-          p[style*="color: #1f2937"] {
+          p[style*="color: #4b5563"],
+          p[style*="color: #6b7280"],
+          label[style*="color: #111827"],
+          label[style*="color: #1f2937"],
+          label[style*="color: #374151"],
+          label[style*="color: #4b5563"],
+          label[style*="color: #6b7280"] {
             color: #d1d5db !important;
           }
 
           /* Borders lighter in dark mode */
           div[style*="border: 1px solid #e5e7eb"],
+          div[style*="border: 2px solid #e5e7eb"],
+          div[style*="border: 1px solid #d1d5db"],
+          div[style*="border: 2px solid #d1d5db"],
           div[style*="borderColor: #e5e7eb"],
           div[style*="border-color: #e5e7eb"] {
-            border-color: #374151 !important;
-          }
-
-          div[style*="border: 1px solid #d1d5db"] {
-            border-color: #4b5563 !important;
-          }
-
-          div[style*="border: 2px solid #d1d5db"] {
             border-color: #4b5563 !important;
           }
 
           /* Input styling for dark mode */
           input[type="text"],
-          input[type="number"] {
-            background: #1f2937 !important;
+          input[type="number"],
+          input[type="radio"],
+          input[type="checkbox"] {
+            background: #2d3748 !important;
             color: #f0f0f0 !important;
             border-color: #4b5563 !important;
+            accent-color: #16a34a !important;
           }
 
           input[type="text"]::placeholder,
@@ -804,7 +822,15 @@ export default function App() {
           }
 
           div[style*="background: #f9fafb"] {
-            background: #111827 !important;
+            background: #1f2937 !important;
+          }
+
+          div[style*="background: #dbeafe"] {
+            background: #0c2d4c !important;
+          }
+
+          div[style*="background: #f3e8ff"] {
+            background: #3b0764 !important;
           }
 
           /* Error/warning colors stay visible */
@@ -813,7 +839,7 @@ export default function App() {
             color: #fecaca !important;
           }
 
-          /* Stage cost display colors */
+          /* Stage cost display colors - make brighter */
           span[style*="color: #1cb353"] {
             color: #86efac !important;
           }
@@ -847,6 +873,49 @@ export default function App() {
             background: #374151 !important;
             color: #e5e7eb !important;
             border-color: #4b5563 !important;
+          }
+
+          /* Buttons */
+          button {
+            background: #2d3748 !important;
+            color: #f0f0f0 !important;
+            border-color: #4b5563 !important;
+          }
+
+          /* Colored stage buttons */
+          button[style*="border: 2px solid"] {
+            background: #1f2937 !important;
+          }
+
+          button[style*="background: #16a34a"],
+          button[style*="background: #2563eb"],
+          button[style*="background: #7c3aed"] {
+            background: inherit !important;
+            color: white !important;
+          }
+
+          /* Progress bar background */
+          div[style*="background: #e5e7eb"] {
+            background: #374151 !important;
+          }
+
+          /* Disabled button */
+          button:disabled {
+            background: #4b5563 !important;
+            color: #9ca3af !important;
+          }
+
+          /* Text in light colored boxes should be dark still */
+          div[style*="background: #ecfdf5"] h3,
+          div[style*="background: #ecfdf5"] label,
+          div[style*="background: #ecfdf5"] span,
+          div[style*="background: #eff6ff"] h3,
+          div[style*="background: #eff6ff"] label,
+          div[style*="background: #eff6ff"] span,
+          div[style*="background: #faf5ff"] h3,
+          div[style*="background: #faf5ff"] label,
+          div[style*="background: #faf5ff"] span {
+            color: #f0f0f0 !important;
           }
         }
       `}</style>
