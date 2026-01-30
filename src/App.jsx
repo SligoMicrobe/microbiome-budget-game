@@ -1088,7 +1088,7 @@ export default function App() {
                   value={participants}
                   min={0}
                   onChange={(e) => setParticipants(clampInt(parseFloat(e.target.value)))}
-                  style={{ width: "100%", padding: 10, borderRadius: 10, border: `2px solid ${COLORS.stage1.primary}` }}
+                  style={{ width: "90%", padding: 10, borderRadius: 10, border: `2px solid ${COLORS.stage1.primary}` }}
                 />
                 <div style={{ color: "#4b5563", fontSize: 12 }}>
                   × £{COSTS.participant[participantType]} = £{(clampInt(participants) * COSTS.participant[participantType]).toFixed(0)}
@@ -1102,7 +1102,7 @@ export default function App() {
                   value={timepoints}
                   min={1}
                   onChange={(e) => setTimepoints(clampInt(parseFloat(e.target.value), 1))}
-                  style={{ width: "100%", padding: 10, borderRadius: 10, border: `2px solid ${COLORS.stage1.primary}` }}
+                  style={{ width: "90%", padding: 10, borderRadius: 10, border: `2px solid ${COLORS.stage1.primary}` }}
                 />
                 <div style={{ color: "#4b5563", fontSize: 12 }}>collection points</div>
               </label>
