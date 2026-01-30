@@ -859,6 +859,18 @@ export default function App() {
             border-color: #374151 !important;
           }
 
+          /* Hard-coded black text needs to be light in dark mode */
+          div[style*="color: #000000"],
+          span[style*="color: #000000"] {
+            color: #f0f0f0 !important;
+          }
+
+          /* Gray text needs to be lighter */
+          div[style*="color: #4b5563"],
+          span[style*="color: #4b5563"] {
+            color: #9ca3af !important;
+          }
+
           /* Borders lighter in dark mode */
           div[style*="border: 1px solid #e5e7eb"],
           div[style*="border: 2px solid #e5e7eb"],
