@@ -1100,6 +1100,7 @@ export default function App() {
                   value={participants}
                   min={0}
                   onChange={(e) => setParticipants(clampInt(parseFloat(e.target.value)))}
+                  onFocus={(e) => e.target.select()}
                   style={{ width: "90%", padding: 10, borderRadius: 10, border: `2px solid ${COLORS.stage1.primary}` }}
                 />
                 <div style={{ color: "#4b5563", fontSize: 12 }}>
@@ -1114,6 +1115,7 @@ export default function App() {
                   value={timepoints}
                   min={1}
                   onChange={(e) => setTimepoints(clampInt(parseFloat(e.target.value), 1))}
+                  onFocus={(e) => e.target.select()}
                   style={{ width: "90%", padding: 10, borderRadius: 10, border: `2px solid ${COLORS.stage1.primary}` }}
                 />
                 <div style={{ color: "#4b5563", fontSize: 12 }}>collection points</div>
